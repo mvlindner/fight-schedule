@@ -1,0 +1,131 @@
+[
+  {
+    "id": "deontay-wilder-vs-derek-chisora-2026-04-04",
+    "sport": "boxing",
+    "eventName": null,
+    "fighters": {
+      "red": "Deontay Wilder",
+      "blue": "Derek Chisora"
+    },
+    "dateUTC": "2026-04-04T21:00:00Z",
+    "location": "London",
+    "broadcaster": "DAZN",
+    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+  },
+  {
+    "id": "tyson-fury-vs-arslanbek-makhmudov-2026-04-11",
+    "sport": "boxing",
+    "eventName": null,
+    "fighters": {
+      "red": "Tyson Fury",
+      "blue": "Arslanbek Makhmudov"
+    },
+    "dateUTC": "2026-04-11T21:00:00Z",
+    "location": "London",
+    "broadcaster": "Netflix",
+    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+  },
+  {
+    "id": "alycia-baumgardner-vs-bo-mi-re-shin-2026-04-17",
+    "sport": "boxing",
+    "eventName": null,
+    "fighters": {
+      "red": "Alycia Baumgardner",
+      "blue": "Bo Mi Re Shin"
+    },
+    "dateUTC": "2026-04-17T07:00:00Z",
+    "location": "New York",
+    "broadcaster": "ESPN",
+    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+  },
+  {
+    "id": "naoya-inoue-vs-junto-nakatani-2026-05-02",
+    "sport": "boxing",
+    "eventName": null,
+    "fighters": {
+      "red": "Naoya Inoue",
+      "blue": "Junto Nakatani"
+    },
+    "dateUTC": "2026-05-02T07:00:00Z",
+    "location": "Tokyo",
+    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+  },
+  {
+    "id": "gilberto-zurdo-ramirez-vs-david-benavidez-2026-05-02",
+    "sport": "boxing",
+    "eventName": null,
+    "fighters": {
+      "red": "Gilberto \"Zurdo\" Ramirez",
+      "blue": "David Benavidez"
+    },
+    "dateUTC": "2026-05-03T03:00:00Z",
+    "location": "Las Vegas",
+    "broadcaster": "DAZN PPV",
+    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+  },
+  {
+    "id": "oleksandr-usyk-vs-rico-verhoeven-2026-05-23",
+    "sport": "boxing",
+    "eventName": null,
+    "fighters": {
+      "red": "Oleksandr Usyk",
+      "blue": "Rico Verhoeven"
+    },
+    "dateUTC": "2026-05-23T20:00:00Z",
+    "location": "Giza, Egypt",
+    "broadcaster": "DAZN",
+    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+  },
+  {
+    "id": "floyd-mayweather-vs-manny-pacquiao-2026-09-19",
+    "sport": "boxing",
+    "eventName": null,
+    "fighters": {
+      "red": "Floyd Mayweather",
+      "blue": "Manny Pacquiao"
+    },
+    "dateUTC": "2026-09-19T07:00:00Z",
+    "location": "Las Vegas",
+    "broadcaster": "Netflix",
+    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+  },
+  {
+    "id": "ufc-327-proch-zka-vs-ulberg",
+    "sport": "mma",
+    "eventName": "UFC 327",
+    "fighters": {
+      "red": "Procházka",
+      "blue": "Ulberg"
+    },
+    "dateUTC": "2026-04-11T23:00:00Z",
+    "location": "Miami",
+    "broadcaster": "Paramount+CBS",
+    "link": "https://www.espn.com/mma/schedule"
+  },
+  {
+    "id": "ufc-328-chimaev-vs-strickland",
+    "sport": "mma",
+    "eventName": "UFC 328",
+    "fighters": {
+      "red": "Chimaev",
+      "blue": "Strickland"
+    },
+    "dateUTC": "2026-05-09T23:00:00Z",
+    "location": "Newark",
+    "broadcaster": "Paramount+",
+    "link": "https://www.espn.com/mma/schedule"
+  },
+  {
+    "id": "ufc-250-topuria-vs-gaethje",
+    "sport": "mma",
+    "eventName": "UFC 250",
+    "fighters": {
+      "red": "Topuria",
+      "blue": "Gaethje"
+    },
+    "dateUTC": "2026-06-15T02:00:00Z",
+    "location": "Washington",
+    "broadcaster": "Paramount+",
+    "link": "https://www.espn.com/mma/schedule"
+  }
+]
