@@ -23,7 +23,7 @@
     "dateUTC": "2026-04-11T21:00:00Z",
     "location": "London",
     "broadcaster": "Netflix",
-    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+    "link": "https://www.netflix.com/tudum/features/fury-makhmudov-conor-benn-regis-prograis-fight-card"
   },
   {
     "id": "alycia-baumgardner-vs-bo-mi-re-shin-2026-04-17",
@@ -36,7 +36,7 @@
     "dateUTC": "2026-04-17T07:00:00Z",
     "location": "New York",
     "broadcaster": "ESPN",
-    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+    "link": "https://www.tapology.com/fightcenter/events/140682-baumgardner-vs-shin"
   },
   {
     "id": "naoya-inoue-vs-junto-nakatani-2026-05-02",
@@ -48,7 +48,7 @@
     },
     "dateUTC": "2026-05-02T07:00:00Z",
     "location": "Tokyo",
-    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+    "link": "https://www.dazn.com/en-US/news/boxing/naoya-inoue-vs-junto-nakatani-how-to-watch-fight-time-ringwalks-prediction-undercard-news-odds/p833p0ofebd01p5mxlw2chy66"
   },
   {
     "id": "gilberto-zurdo-ramirez-vs-david-benavidez-2026-05-02",
@@ -61,7 +61,7 @@
     "dateUTC": "2026-05-03T03:00:00Z",
     "location": "Las Vegas",
     "broadcaster": "DAZN PPV",
-    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+    "link": "https://www.premierboxingchampions.com/fight-night-may-02-2026"
   },
   {
     "id": "oleksandr-usyk-vs-rico-verhoeven-2026-05-23",
@@ -74,7 +74,7 @@
     "dateUTC": "2026-05-23T20:00:00Z",
     "location": "Giza, Egypt",
     "broadcaster": "DAZN",
-    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+    "link": "https://www.dazn.com/en-US/news/boxing/oleksandr-usyk-vs-rico-verhoeven-how-to-watch-fight-time-ringwalks-prediction-undercard-news-odds/lbotzto205bb1921c2ypx1b15"
   },
   {
     "id": "floyd-mayweather-vs-manny-pacquiao-2026-09-19",
@@ -87,7 +87,7 @@
     "dateUTC": "2026-09-19T07:00:00Z",
     "location": "Las Vegas",
     "broadcaster": "Netflix",
-    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
+    "link": "https://www.dazn.com/en-US/news/boxing/mayweather-vs-pacquiao-how-to-watch-fight-time-ringwalks-prediction-undercard-news-odds/7708rqovb9v01nzovbncndti8"
   },
   {
     "id": "ufc-327-proch-zka-vs-ulberg",
@@ -100,7 +100,7 @@
     "dateUTC": "2026-04-11T23:00:00Z",
     "location": "Miami",
     "broadcaster": "Paramount+CBS",
-    "link": "https://www.espn.com/mma/schedule"
+    "link": "https://www.ufc.com/event/ufc-327"
   },
   {
     "id": "ufc-328-chimaev-vs-strickland",
@@ -113,7 +113,7 @@
     "dateUTC": "2026-05-09T23:00:00Z",
     "location": "Newark",
     "broadcaster": "Paramount+",
-    "link": "https://www.espn.com/mma/schedule"
+    "link": "https://www.ufc.com/event/ufc-328"
   },
   {
     "id": "ufc-250-topuria-vs-gaethje",
@@ -126,6 +126,6 @@
     "dateUTC": "2026-06-15T02:00:00Z",
     "location": "Washington",
     "broadcaster": "Paramount+",
-    "link": "https://www.espn.com/mma/schedule"
+    "link": "https://www.ufc.com/event/ufc-freedom-250"
   }
 ]
