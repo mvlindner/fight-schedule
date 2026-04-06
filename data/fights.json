@@ -1,18 +1,5 @@
 [
   {
-    "id": "deontay-wilder-vs-derek-chisora-2026-04-04",
-    "sport": "boxing",
-    "eventName": null,
-    "fighters": {
-      "red": "Deontay Wilder",
-      "blue": "Derek Chisora"
-    },
-    "dateUTC": "2026-04-04T21:00:00Z",
-    "location": "London",
-    "broadcaster": "DAZN",
-    "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule"
-  },
-  {
     "id": "tyson-fury-vs-arslanbek-makhmudov-2026-04-11",
     "sport": "boxing",
     "eventName": null,
