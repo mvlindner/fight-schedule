@@ -400,7 +400,7 @@ export default function FightSchedule({ fights }: Props) {
           <p>Times listed are estimated start times for the main event.</p>
           <br />
           <p>
-            Buy me a coffee at:{" "} to support ongoing cost.
+            Buy me a coffee to support ongoing cost:{" "} 
             <a
               href="https://ko-fi.com/marcolindner"
               target="_blank"
