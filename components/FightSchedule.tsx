@@ -394,13 +394,13 @@ export default function FightSchedule({ fights }: Props) {
               close
             </span>
           </div>
-          <p>fight schedule is a free, non-commercial project.</p>
-          <p>it exists to simplify your life and help you not miss major fights.</p>
-          <p>times are shown in your local timezone.</p>
-          <p>times shown are estimated main event start times.</p>
+          <p>Fight Schedule is a free, non-commercial project.</p>
+          <p>It helps you keep track of major fights so you don’t miss them.</p>
+          <p>All times are shown in your local timezone.</p>
+          <p>Times listed are estimated start times for the main event.</p>
           <br />
           <p>
-            buy me a coffee at:{" "}
+            Buy me a coffee at:{" "}
             <a
               href="https://ko-fi.com/marcolindner"
               target="_blank"
