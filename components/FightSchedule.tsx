@@ -407,7 +407,7 @@ export default function FightSchedule({ fights }: Props) {
               rel="noopener noreferrer"
               className="text-violet-500 dark:text-red-300 hover:text-violet-700 dark:hover:text-red-400 transition-colors duration-150"
             >
-              https://ko-fi.com/marcovlindner
+              https://ko-fi.com/mvlindner
             </a>
           </p>
           <br />
