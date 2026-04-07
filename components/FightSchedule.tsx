@@ -400,7 +400,7 @@ export default function FightSchedule({ fights }: Props) {
           <p>Times listed are estimated start times for the main event.</p>
           <br />
           <p>
-            Buy me a coffee at:{" "}
+            Buy me a coffee at:{" "} to support ongoing cost.
             <a
               href="https://ko-fi.com/marcolindner"
               target="_blank"
@@ -410,6 +410,11 @@ export default function FightSchedule({ fights }: Props) {
               https://ko-fi.com/marcolindner
             </a>
           </p>
+          <p><strong>Legal Notice</strong></p>
+          <p>Name: Marco Lindner</p>
+          <p>Wohnort: Salzburg, Austria</p>
+          <p>Email: marcovlindner@gmx.at</p>
+          <p>This is a non-commercial project.</p>
         </div>
 
         <div className="timeline relative">
