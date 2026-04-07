@@ -407,12 +407,13 @@ export default function FightSchedule({ fights }: Props) {
               rel="noopener noreferrer"
               className="text-violet-500 dark:text-red-300 hover:text-violet-700 dark:hover:text-red-400 transition-colors duration-150"
             >
-              https://ko-fi.com/marcolindner
+              https://ko-fi.com/marcovlindner
             </a>
           </p>
+          <br />
           <p><strong>Legal Notice</strong></p>
           <p>Name: Marco Lindner</p>
-          <p>Wohnort: Salzburg, Austria</p>
+          <p>Location: Salzburg, Austria</p>
           <p>Email: marcovlindner@gmx.at</p>
           <p>This is a non-commercial project.</p>
         </div>
