@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import DateSection from "@/components/DateSection";
+import FightList from "@/components/FightList";
 import ThemeToggle from "@/components/ThemeToggle";
 import TimezoneSelector from "@/components/TimezoneSelector";
 import ImprintContent from "@/components/legal/ImprintContent";
@@ -29,6 +29,7 @@ const IANA_BY_TIMEZONE: Record<TimezoneOption, string> = {
   EST: "America/New_York",
   PST: "America/Los_Angeles",
 };
+const TIMELINE_DAY_ANIMATION_MS = 950;
 
 function getDetectedTimezone(): string {
   try {
@@ -113,12 +114,38 @@ export default function FightSchedule({ fights }: Props) {
   const [isHeaderDimmed, setIsHeaderDimmed] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [activeFightId, setActiveFightId] = useState<string | null>(null);
+  const [isTimezoneReady, setIsTimezoneReady] = useState(false);
   const [legalModal, setLegalModal] = useState<LegalModal>(null);
   const [isLegalModalClosing, setIsLegalModalClosing] = useState(false);
+  const [animatedTimelineDayKeys, setAnimatedTimelineDayKeys] = useState<string[]>([]);
+  const timelineAnimationTimeoutRef = useRef<number | null>(null);
 
   const [timezone, setTimezone] = useState<TimezoneOption>("UTC");
 
   const handleTimezoneChange = (nextTimezone: TimezoneOption) => {
+    const currentDayKeys = new Set(
+      fights.map((fight) => getLocalDateKey(fight.date, fight.time_utc, timezone)),
+    );
+    const nextDayKeys = new Set(
+      fights.map((fight) => getLocalDateKey(fight.date, fight.time_utc, nextTimezone)),
+    );
+    const newDayKeys = Array.from(nextDayKeys).filter((dayKey) => !currentDayKeys.has(dayKey));
+
+    if (timelineAnimationTimeoutRef.current) {
+      window.clearTimeout(timelineAnimationTimeoutRef.current);
+      timelineAnimationTimeoutRef.current = null;
+    }
+
+    if (newDayKeys.length > 0) {
+      setAnimatedTimelineDayKeys(newDayKeys);
+      timelineAnimationTimeoutRef.current = window.setTimeout(() => {
+        setAnimatedTimelineDayKeys([]);
+        timelineAnimationTimeoutRef.current = null;
+      }, TIMELINE_DAY_ANIMATION_MS);
+    } else {
+      setAnimatedTimelineDayKeys([]);
+    }
+
     setTimezone(nextTimezone);
     localStorage.setItem(STORAGE_KEY, nextTimezone);
   };
@@ -127,12 +154,22 @@ export default function FightSchedule({ fights }: Props) {
 
   useEffect(() => {
     const nextTimezone = getPreferredTimezone();
+
     const frameId = window.requestAnimationFrame(() => {
       setTimezone(nextTimezone);
+      setIsTimezoneReady(true);
     });
 
     return () => {
       window.cancelAnimationFrame(frameId);
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timelineAnimationTimeoutRef.current) {
+        window.clearTimeout(timelineAnimationTimeoutRef.current);
+      }
     };
   }, []);
 
@@ -165,6 +202,11 @@ export default function FightSchedule({ fights }: Props) {
     }
     return Array.from(byDate.entries());
   }, [fights, timezone]);
+
+  const loadingSkeletonGroups = useMemo(() => {
+    const count = Math.min(8, Math.max(4, groupedFights.length || 0));
+    return Array.from({ length: count }, (_, index) => index);
+  }, [groupedFights.length]);
 
   const highlight = useMemo(() => {
     return getHighlightedFights(fights, timezone, new Date(now));
@@ -367,19 +409,13 @@ export default function FightSchedule({ fights }: Props) {
 
   useEffect(() => {
     if (legalModal) {
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      if (scrollbarWidth > 0) {
-        document.body.style.paddingRight = `${scrollbarWidth}px`;
-      }
       document.body.classList.add("overflow-hidden");
     } else {
       document.body.classList.remove("overflow-hidden");
-      document.body.style.paddingRight = "";
     }
 
     return () => {
       document.body.classList.remove("overflow-hidden");
-      document.body.style.paddingRight = "";
     };
   }, [legalModal]);
 
@@ -423,29 +459,40 @@ export default function FightSchedule({ fights }: Props) {
             .
           </span>
         </h1>
-        <div className="flex items-center gap-3 leading-none text-neutral-500 dark:text-neutral-400">
-          <span
-            className={`relative top-[1px] text-sm leading-none tracking-wide transition-colors duration-200 ${
-              hasHighlightedState
-                ? "text-violet-600/60 dark:text-red-300/60"
-                : "text-neutral-600 dark:text-neutral-300 opacity-80"
-            }`}
-          >
-            {clock}
-          </span>
-          <TimezoneSelector
-            value={timezone}
-            onChange={handleTimezoneChange}
-            triggerClassName="header-control"
-          />
-          <ThemeToggle className="header-control" />
-          <span
-            className={`header-control info-trigger ${isInfoOpen ? "active" : ""}`}
-            onClick={toggleInfo}
-          >
-            info
-          </span>
-        </div>
+        {isTimezoneReady ? (
+          <div className="flex items-center gap-3 leading-none text-neutral-500 dark:text-neutral-400">
+            <span
+              className={`relative top-[1px] text-sm leading-none tracking-wide transition-colors duration-200 ${
+                hasHighlightedState
+                  ? "text-violet-600/60 dark:text-red-300/60"
+                  : "text-neutral-600 dark:text-neutral-300 opacity-80"
+              }`}
+            >
+              {clock}
+            </span>
+            <TimezoneSelector
+              value={timezone}
+              onChange={handleTimezoneChange}
+              triggerClassName="header-control"
+            />
+            <ThemeToggle className="header-control" />
+            <span
+              className={`header-control info-trigger ${isInfoOpen ? "active" : ""}`}
+              onClick={toggleInfo}
+            >
+              info
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 leading-none text-neutral-500 dark:text-neutral-400">
+            <span className="relative top-[1px] text-sm leading-none tracking-wide text-violet-600/70 dark:text-red-300/70">
+              {clock}
+            </span>
+            <span className="header-control pointer-events-none">UTC</span>
+            <span className="header-control pointer-events-none">light</span>
+            <span className="header-control pointer-events-none">info</span>
+          </div>
+        )}
       </header>
 
       <main className="content flex-1">
@@ -485,50 +532,81 @@ export default function FightSchedule({ fights }: Props) {
           <br />
         </div>
 
-        <div className="timeline relative">
-          <div className="absolute left-[6px] top-0 bottom-0 w-px bg-neutral-400/60 dark:bg-neutral-600/50" />
+        {isTimezoneReady ? (
+          <div className="timeline relative">
+            <div className="absolute left-[6px] top-0 bottom-0 w-px bg-neutral-400/60 dark:bg-neutral-600/50" />
 
-          <div className="pl-10">
-            <section className="space-y-24">
-              {groupedFights.map(([dateKey, dateFights]) => (
-                <DateSection
-                  key={dateKey}
-                  dateKey={dateKey}
-                  fights={dateFights}
-                  highlightType={highlight.type}
-                  highlightedIds={highlightedIds}
-                  timezone={timezone}
-                  activeFightId={activeFightId}
-                  setActiveFightId={setActiveFightId}
-                />
-              ))}
-            </section>
+            <div className="pl-10">
+              <FightList
+                fights={fights}
+                timezone={timezone}
+                highlightType={highlight.type}
+                highlightedIds={highlightedIds}
+                activeFightId={activeFightId}
+                setActiveFightId={setActiveFightId}
+                animatedTimelineDayKeys={animatedTimelineDayKeys}
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="timeline relative">
+            <div className="absolute left-[6px] top-0 bottom-0 w-px bg-neutral-400/60 dark:bg-neutral-600/50" />
+            <div className="pl-10">
+              <section className="space-y-24 animate-pulse min-h-[100vh]">
+                {loadingSkeletonGroups.map((groupIndex) => {
+                  const headerWidthClass =
+                    groupIndex % 3 === 0 ? "w-48" : groupIndex % 3 === 1 ? "w-44" : "w-52";
+                  const titleWidthClass =
+                    groupIndex % 3 === 0 ? "w-[28rem]" : groupIndex % 3 === 1 ? "w-[26rem]" : "w-[24rem]";
+
+                  return (
+                    <div key={groupIndex} className="space-y-5">
+                      <div
+                        className={`h-3 ${headerWidthClass} rounded bg-neutral-300/40 dark:bg-neutral-700/40`}
+                      />
+                      <div className="flex items-baseline gap-2">
+                        <div className="h-4 w-16 rounded bg-neutral-300/40 dark:bg-neutral-700/40" />
+                        <div
+                          className={`h-8 ${titleWidthClass} rounded bg-neutral-300/40 dark:bg-neutral-700/40`}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </section>
+            </div>
+          </div>
+        )}
       </main>
-      <footer className="pt-14 pb-6 text-center">
-        <button
-          type="button"
-          onClick={() => {
-            setLegalModal("imprint");
-            setIsLegalModalClosing(false);
-          }}
-          className="text-xs tracking-wide text-neutral-500/60 dark:text-neutral-400/60 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors duration-150"
-        >
-          Imprint
-        </button>
-        <span className="mx-2 text-xs text-neutral-500/40 dark:text-neutral-400/40">•</span>
-        <button
-          type="button"
-          onClick={() => {
-            setLegalModal("privacy");
-            setIsLegalModalClosing(false);
-          }}
-          className="text-xs tracking-wide text-neutral-500/60 dark:text-neutral-400/60 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors duration-150"
-        >
-          Privacy
-        </button>
-      </footer>
+      {isTimezoneReady ? (
+        <footer className="pt-14 pb-6 text-center">
+          <button
+            type="button"
+            onClick={() => {
+              setLegalModal("imprint");
+              setIsLegalModalClosing(false);
+            }}
+            className="text-xs tracking-wide text-neutral-500/60 dark:text-neutral-400/60 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors duration-150"
+          >
+            Imprint
+          </button>
+          <span className="mx-2 text-xs text-neutral-500/40 dark:text-neutral-400/40">•</span>
+          <button
+            type="button"
+            onClick={() => {
+              setLegalModal("privacy");
+              setIsLegalModalClosing(false);
+            }}
+            className="text-xs tracking-wide text-neutral-500/60 dark:text-neutral-400/60 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors duration-150"
+          >
+            Privacy
+          </button>
+          <span className="mx-2 text-xs text-neutral-500/40 dark:text-neutral-400/40">•</span>
+          <span className="text-xs tracking-wide text-neutral-500/60 dark:text-neutral-400/60">
+            © 2026 Fight Schedule
+          </span>
+        </footer>
+      ) : null}
       {legalModal ? (
         <div
           className={`fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 backdrop-blur-[4px] px-4 py-8 ${

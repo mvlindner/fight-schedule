@@ -21,6 +21,8 @@
 
 html {
   transition: background-color 180ms ease-out, color 180ms ease-out;
+  scrollbar-gutter: stable both-edges;
+  overflow-y: scroll;
 }
 
 h1,
@@ -38,7 +40,7 @@ p {
 }
 
 .timeline-dot {
-  background-color: rgba(163, 163, 163, 0.75);
+  background-color: rgb(186 186 186);
   scale: 1;
   box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   transition:
@@ -48,11 +50,15 @@ p {
 }
 
 .dark .timeline-dot {
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: rgb(102 102 102);
 }
 
 .timeline-dot.is-highlighted {
-  background-color: color-mix(in srgb, var(--accent-color) 55%, transparent);
+  background-color: color-mix(in srgb, var(--accent-color) 68%, rgb(186 186 186));
+}
+
+.dark .timeline-dot.is-highlighted {
+  background-color: color-mix(in srgb, var(--accent-color) 68%, rgb(102 102 102));
 }
 
 .timeline-dot.active {

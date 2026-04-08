@@ -4,6 +4,7 @@ import { generateMockFights } from "@/lib/mockFights";
 import type { Fight } from "@/lib/time";
 
 type ScrapedFight = {
+  id?: string;
   sport?: string;
   status?: string;
   eventName?: string | null;
@@ -38,6 +39,7 @@ function normalizeFight(raw: unknown): Fight | null {
   }
 
   const candidate = raw as Partial<Fight> & ScrapedFight;
+  const normalizedId = typeof candidate.id === "string" ? candidate.id : undefined;
   const status = candidate.status === "past" ? "past" : "upcoming";
 
   if (
@@ -50,6 +52,7 @@ function normalizeFight(raw: unknown): Fight | null {
     typeof candidate.link === "string"
   ) {
     return {
+      id: normalizedId,
       date: candidate.date,
       time_utc: candidate.time_utc,
       fighters: [candidate.fighters[0], candidate.fighters[1]],
@@ -75,6 +78,7 @@ function normalizeFight(raw: unknown): Fight | null {
     const sport = String(candidate.sport || "").toLowerCase();
 
     return {
+      id: normalizedId,
       date,
       time_utc,
       fighters: [candidate.fighters.red, candidate.fighters.blue],

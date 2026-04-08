@@ -4,6 +4,7 @@ export const TIMEZONE_OPTIONS = ["UTC", "CET", "EST", "PST"] as const;
 export type TimezoneOption = (typeof TIMEZONE_OPTIONS)[number];
 
 export type Fight = {
+  id?: string;
   date: string;
   time_utc: string;
   fighters: [string, string];
@@ -42,6 +43,9 @@ export function getUtcDateTime(date: string, timeUtc: string): DateTime {
 }
 
 export function getFightId(fight: Fight): string {
+  if (fight.id) {
+    return fight.id;
+  }
   return `${fight.date}-${fight.time_utc}-${fight.fighters[0]}-${fight.fighters[1]}`;
 }
 
