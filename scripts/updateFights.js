@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+const fs = require("fs");
+const path = require("path");
 const { execSync } = require("child_process");
 const { isDeepStrictEqual } = require("util");
 const {
@@ -296,6 +298,21 @@ function cleanupFights(store, scrapedFights) {
   return { deletedCount, exampleDeleted };
 }
 
+function writePipelineSummary(summary) {
+  const summaryPath = process.env.PIPELINE_SUMMARY_PATH;
+  if (!summaryPath) {
+    return;
+  }
+
+  try {
+    const resolved = path.resolve(summaryPath);
+    fs.mkdirSync(path.dirname(resolved), { recursive: true });
+    fs.writeFileSync(resolved, JSON.stringify(summary, null, 2), "utf8");
+  } catch (error) {
+    console.warn(`Failed to write pipeline summary: ${error.message}`);
+  }
+}
+
 console.log("Starting fight data update pipeline");
 
 const store = loadFightStore();
@@ -360,6 +377,7 @@ const combinedUpdates = mergedUpdates + enrichmentUpdates;
 const totalChanges = newFightCount + mergedUpdates + enrichmentUpdates + collapsedBeforeEnrich + collapsedAfterEnrich;
 const totalChangesWithCleanup = totalChanges + cleanup.deletedCount;
 const pipelineStatus = totalChangesWithCleanup > 0 ? "UPDATED" : "OK";
+const completedAt = new Date().toISOString();
 
 console.log("\nSummary:");
 console.log(
@@ -393,7 +411,7 @@ console.log(
   `TOTAL: ${totalFights} fights | ${newFightCount} new | ${combinedUpdates} updated | ${cleanup.deletedCount} past deleted`,
 );
 console.log(`STATUS: ${pipelineStatus}`);
-console.log(`Completed at: ${new Date().toISOString()}`);
+console.log(`Completed at: ${completedAt}`);
 console.log("================================================");
 
 const linkGaps = getLinkGaps(finalStore);
@@ -409,3 +427,20 @@ if (linkGaps.length > 0) {
 } else {
   console.log("\nFight Card Link Alert: none missing");
 }
+
+writePipelineSummary({
+  totalFights,
+  newFights: newFightCount,
+  updatedFights: combinedUpdates,
+  deletedPastFights: cleanup.deletedCount,
+  status: pipelineStatus,
+  completedAt,
+  missingFightCards: linkGaps.length,
+  missingFightCardExamples: linkGaps.slice(0, 10).map(([id, fight]) => ({
+    id,
+    red: fight?.fighters?.red || "Unknown",
+    blue: fight?.fighters?.blue || "Unknown",
+    date: String(fight?.dateUTC || "").slice(0, 10) || "Unknown date",
+    link: String(fight?.link || "MISSING"),
+  })),
+});

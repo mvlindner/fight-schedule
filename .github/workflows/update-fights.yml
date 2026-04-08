@@ -20,6 +20,7 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      DISCORD_MENTION_USER_ID: ${{ secrets.DISCORD_MENTION_USER_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -37,6 +38,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run fight update pipeline
+        env:
+          PIPELINE_SUMMARY_PATH: .tmp/pipeline-summary.json
         run: npm run update:fights
 
       - name: Detect fight data changes
@@ -94,6 +97,10 @@ jobs:
             const fights = raw && raw.fights && typeof raw.fights === "object"
               ? Object.entries(raw.fights).map(([id, fight]) => ({ id, ...(fight || {}) }))
               : [];
+            const summaryPath = ".tmp/pipeline-summary.json";
+            const summaryFromScript = fs.existsSync(summaryPath)
+              ? JSON.parse(fs.readFileSync(summaryPath, "utf8"))
+              : null;
 
             const placeholderPatterns = [
               /google\.com\/search/i,
@@ -117,13 +124,28 @@ jobs:
               });
 
             const summary = [
+              process.env.DISCORD_MENTION_USER_ID
+                ? `<@${process.env.DISCORD_MENTION_USER_ID}>`
+                : null,
               process.env.NOTIFY_REASON === "manual-test"
                 ? "Fight data check (manual Discord test)"
                 : "Fight data updated",
-              `- Total fights: ${fights.length}`,
-              `- Missing fight cards: ${missing.length}`,
+              "================ PIPELINE TOTALS ================",
+              `TOTAL: ${
+                summaryFromScript?.totalFights ?? fights.length
+              } fights | ${
+                summaryFromScript?.newFights ?? 0
+              } new | ${
+                summaryFromScript?.updatedFights ?? 0
+              } updated | ${
+                summaryFromScript?.deletedPastFights ?? 0
+              } past deleted`,
+              `STATUS: ${summaryFromScript?.status || "OK"}`,
+              `Completed at: ${summaryFromScript?.completedAt || new Date().toISOString()}`,
+              "================================================",
+              `Missing fight cards: ${summaryFromScript?.missingFightCards ?? missing.length}`,
               `- Workflow: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
-            ];
+            ].filter(Boolean);
 
             if (sampleLines.length > 0) {
               summary.push("", "Missing link examples:", ...sampleLines);
