@@ -521,7 +521,7 @@ export default function FightSchedule({ fights }: Props) {
           <p>
             Buy me a coffee to support ongoing cost:{" "} 
             <a
-              href="https://ko-fi.com/marcolindner"
+              href="https://ko-fi.com/mvlindner"
               target="_blank"
               rel="noopener noreferrer"
               className="text-violet-500 dark:text-red-300 hover:text-violet-700 dark:hover:text-red-400 transition-colors duration-150"
