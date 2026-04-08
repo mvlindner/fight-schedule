@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-const fs = require("fs");
-const path = require("path");
 const axios = require("axios");
 const cheerio = require("cheerio");
+const { buildFightId } = require("./scripts/fightStore");
 
 const ESPN_URL = "https://www.espn.com/mma/schedule";
-const FILE_PATH = path.join(__dirname, "data", "fights.json");
 const MONTHS = {
   jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
   jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
@@ -13,10 +11,6 @@ const MONTHS = {
 
 function normalize(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
-}
-
-function slug(value) {
-  return normalize(value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
 function toCityLocation(location) {
@@ -50,13 +44,22 @@ async function run() {
   const $ = cheerio.load(response.data);
   const year = 2026;
   const ufcFights = [];
+  const seenIds = new Set();
+  let rawEventsScanned = 0;
+  let validFightsExtracted = 0;
+  let invalidFights = 0;
+  let duplicateFights = 0;
 
   $("table.Table tr").each((_, tr) => {
+    rawEventsScanned += 1;
     const cells = [];
     $(tr).find("td").each((__, td) => {
       cells.push(normalize($(td).text()));
     });
-    if (cells.length < 4) return;
+    if (cells.length < 4) {
+      invalidFights += 1;
+      return;
+    }
 
     const dateText = cells[0];
     const timeText = cells[1];
@@ -64,22 +67,40 @@ async function run() {
     const eventName = cells[3];
     const location = toCityLocation(cells[4] || "");
 
-    if (!(eventName.includes("UFC") && /\d+/.test(eventName))) return;
-    if (/UFC\s+Fight\s+Night/i.test(eventName)) return;
+    if (!(eventName.includes("UFC") && /\d+/.test(eventName))) {
+      invalidFights += 1;
+      return;
+    }
+    if (/UFC\s+Fight\s+Night/i.test(eventName)) {
+      invalidFights += 1;
+      return;
+    }
 
     const eventNumberMatch = eventName.match(/(\d+)/);
-    if (!eventNumberMatch) return;
+    if (!eventNumberMatch) {
+      invalidFights += 1;
+      return;
+    }
     const eventNumber = eventNumberMatch[1];
 
     const fightersMatch = eventName.match(/:\s*(.+?)\s+vs\.?\s+(.+)$/i);
-    if (!fightersMatch) return;
+    if (!fightersMatch) {
+      invalidFights += 1;
+      return;
+    }
     const red = normalize(fightersMatch[1]);
     const blue = normalize(fightersMatch[2]);
 
     const dateMatch = dateText.match(/^([A-Za-z]{3})\s+(\d{1,2})$/);
-    if (!dateMatch) return;
+    if (!dateMatch) {
+      invalidFights += 1;
+      return;
+    }
     const month = MONTHS[dateMatch[1].toLowerCase()];
-    if (!month) return;
+    if (!month) {
+      invalidFights += 1;
+      return;
+    }
     const day = Number(dateMatch[2]);
 
     let hours = 0;
@@ -95,6 +116,7 @@ async function run() {
       hours = Number(twentyFourHour[1]);
       minutes = Number(twentyFourHour[2]);
     } else {
+      invalidFights += 1;
       return;
     }
 
@@ -111,37 +133,46 @@ async function run() {
     const dd = String(utcDate.getUTCDate()).padStart(2, "0");
     const hh = String(utcDate.getUTCHours()).padStart(2, "0");
     const mi = String(utcDate.getUTCMinutes()).padStart(2, "0");
+    const dateUTC = `${yyyy}-${mm}-${dd}T${hh}:${mi}:00Z`;
+
+    const id = buildFightId({
+      fighters: { red, blue },
+      dateUTC,
+    });
+    if (seenIds.has(id)) {
+      duplicateFights += 1;
+      return;
+    }
+    seenIds.add(id);
 
     ufcFights.push({
-      id: `ufc-${eventNumber}-${slug(red)}-vs-${slug(blue)}`,
+      id,
       sport,
       eventName: `UFC ${eventNumber}`,
       fighters: { red, blue },
-      dateUTC: `${yyyy}-${mm}-${dd}T${hh}:${mi}:00Z`,
+      dateUTC,
       location: location || undefined,
       broadcaster: normalize(broadcaster) || undefined,
       link: ESPN_URL,
     });
+    validFightsExtracted += 1;
   });
 
-  const existing = fs.existsSync(FILE_PATH)
-    ? JSON.parse(fs.readFileSync(FILE_PATH, "utf8"))
-    : [];
-
-  const mergedById = new Map(existing.map((fight) => [fight.id, fight]));
-  for (const fight of ufcFights) {
-    mergedById.set(fight.id, fight);
-  }
-
-  const merged = Array.from(mergedById.values()).map((fight) => ({
+  const fights = ufcFights.map((fight) => ({
     ...fight,
     link: resolveFightLink(fight),
   }));
-  fs.mkdirSync(path.dirname(FILE_PATH), { recursive: true });
-  fs.writeFileSync(FILE_PATH, JSON.stringify(merged, null, 2), "utf8");
 
-  console.log("UFC events found:", ufcFights.length);
-  console.log(`Merged ${ufcFights.length} UFC fights`);
+  const result = {
+    source: "ufc",
+    rawEventsScanned,
+    validFightsExtracted,
+    invalidFights,
+    duplicateFights,
+    fights,
+  };
+
+  console.log(JSON.stringify(result));
 }
 
 run().catch((error) => {

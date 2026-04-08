@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const axios = require("axios");
 const cheerio = require("cheerio");
-const fs = require("fs");
-const path = require("path");
+const { buildFightId } = require("./scripts/fightStore");
 
 const ESPN_URL =
   "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule";
@@ -23,18 +22,6 @@ function toIsoDate(dateLabel) {
   const mm = String(parsed.getUTCMonth() + 1).padStart(2, "0");
   const dd = String(parsed.getUTCDate()).padStart(2, "0");
   return `${yyyy}-${mm}-${dd}T00:00:00Z`;
-}
-
-function slug(value) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-function getId(red, blue, isoDateTime) {
-  const dateOnly = isoDateTime.slice(0, 10);
-  return `${slug(red)}-vs-${slug(blue)}-${dateOnly}`;
 }
 
 function resolveFightLink(fight) {
@@ -88,7 +75,10 @@ function parseListItem(text) {
     .trim();
 
   return {
-    id: getId(red, blue, dateUTC),
+    id: buildFightId({
+      fighters: { red, blue },
+      dateUTC,
+    }),
     sport: "boxing",
     eventName: null,
     fighters: {
@@ -127,24 +117,43 @@ async function run() {
   }
 
   const fights = [];
-  keyDatesList.find("li").each((_, li) => {
-    const parsed = parseListItem($(li).text());
-    if (parsed) {
-      parsed.link = resolveFightLink(parsed);
-      fights.push(parsed);
-    }
-  });
+  const seenIds = new Set();
+  const listItems = keyDatesList.find("li");
+  let rawEventsScanned = 0;
+  let validFightsExtracted = 0;
+  let invalidFights = 0;
+  let duplicateFights = 0;
 
-  const dataDir = path.join(__dirname, "data");
-  const outputFile = path.join(dataDir, "fights.json");
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+  listItems.each((_, li) => {
+  rawEventsScanned += 1;
+  const parsed = parseListItem($(li).text());
+
+  if (!parsed) {
+    invalidFights += 1;
+    return;
   }
 
-  fs.writeFileSync(outputFile, JSON.stringify(fights, null, 2), "utf8");
+  if (seenIds.has(parsed.id)) {
+    duplicateFights += 1;
+    return;
+  }
 
-  console.log(JSON.stringify(fights, null, 2));
-  console.log(`Saved ${fights.length} fights to data/fights.json`);
+  seenIds.add(parsed.id);
+  parsed.link = resolveFightLink(parsed);
+  fights.push(parsed);
+  validFightsExtracted += 1;
+});
+
+const result = {
+  source: "espn",
+  rawEventsScanned,
+  validFightsExtracted,
+  invalidFights,
+  duplicateFights,
+  fights,
+};
+
+console.log(JSON.stringify(result));
 }
 
 run().catch((error) => {

@@ -16,6 +16,21 @@ type ScrapedFight = {
   link?: string;
 };
 
+function toFightList(raw: unknown): unknown[] {
+  if (Array.isArray(raw)) {
+    return raw;
+  }
+
+  if (raw && typeof raw === "object" && "fights" in raw) {
+    const candidate = raw as { fights?: Record<string, unknown> };
+    if (candidate.fights && typeof candidate.fights === "object") {
+      return Object.values(candidate.fights);
+    }
+  }
+
+  return [];
+}
+
 function normalizeFight(raw: unknown): Fight | null {
   if (!raw || typeof raw !== "object") {
     return null;
@@ -81,7 +96,7 @@ export default function Home() {
 
   const sourceFights = USE_MOCK_FIGHTS
     ? mockFights
-    : (fights as unknown[]).map(normalizeFight).filter((fight): fight is Fight => fight !== null);
+    : toFightList(fights).map(normalizeFight).filter((fight): fight is Fight => fight !== null);
 
   return <FightSchedule fights={sourceFights} />;
 }

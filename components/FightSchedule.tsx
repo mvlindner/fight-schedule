@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import DateSection from "@/components/DateSection";
 import ThemeToggle from "@/components/ThemeToggle";
 import TimezoneSelector from "@/components/TimezoneSelector";
+import ImprintContent from "@/components/legal/ImprintContent";
+import PrivacyContent from "@/components/legal/PrivacyContent";
 import {
   getNow,
   getHighlightedFights,
@@ -16,6 +18,9 @@ import {
 type Props = {
   fights: Fight[];
 };
+
+type LegalModal = "imprint" | "privacy" | null;
+const LEGAL_MODAL_CLOSE_MS = 450;
 
 const STORAGE_KEY = "user-timezone";
 const IANA_BY_TIMEZONE: Record<TimezoneOption, string> = {
@@ -91,6 +96,15 @@ function formatClock(timezone: TimezoneOption, now: number): string {
   }).format(new Date(now));
 }
 
+function getCurrentUtcDateLabel(): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date());
+}
+
 export default function FightSchedule({ fights }: Props) {
   const hasAppliedInitialFocusRef = useRef(false);
   const headerRef = useRef<HTMLDivElement | null>(null);
@@ -99,6 +113,8 @@ export default function FightSchedule({ fights }: Props) {
   const [isHeaderDimmed, setIsHeaderDimmed] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [activeFightId, setActiveFightId] = useState<string | null>(null);
+  const [legalModal, setLegalModal] = useState<LegalModal>(null);
+  const [isLegalModalClosing, setIsLegalModalClosing] = useState(false);
 
   const [timezone, setTimezone] = useState<TimezoneOption>("UTC");
 
@@ -159,6 +175,7 @@ export default function FightSchedule({ fights }: Props) {
   }, [highlight.ids]);
 
   const hasHighlightedState = highlight.type === "tonight" || highlight.type === "next";
+  const privacyLastUpdated = useMemo(() => getCurrentUtcDateLabel(), []);
 
   useEffect(() => {
     const syncFadeState = () => {
@@ -317,6 +334,56 @@ export default function FightSchedule({ fights }: Props) {
   }, []);
 
   useEffect(() => {
+    if (!legalModal) {
+      return;
+    }
+
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsLegalModalClosing(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [legalModal]);
+
+  useEffect(() => {
+    if (!legalModal || !isLegalModalClosing) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setLegalModal(null);
+      setIsLegalModalClosing(false);
+    }, LEGAL_MODAL_CLOSE_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [legalModal, isLegalModalClosing]);
+
+  useEffect(() => {
+    if (legalModal) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+      document.body.style.paddingRight = "";
+    }
+
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+      document.body.style.paddingRight = "";
+    };
+  }, [legalModal]);
+
+  useEffect(() => {
     const handleClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
       if (!target?.closest(".fight-item")) {
@@ -330,9 +397,13 @@ export default function FightSchedule({ fights }: Props) {
     };
   }, []);
 
+  const closeLegalModal = useCallback(() => {
+    setIsLegalModalClosing(true);
+  }, []);
+
   return (
     <section
-      className={`timeline-container mx-auto px-6 py-20 text-left text-neutral-900 dark:text-neutral-100 ${
+      className={`timeline-container mx-auto min-h-screen px-6 py-20 text-left text-neutral-900 dark:text-neutral-100 ${
         activeFightId ? "has-active" : ""
       }`}
     >
@@ -377,7 +448,7 @@ export default function FightSchedule({ fights }: Props) {
         </div>
       </header>
 
-      <main className="content">
+      <main className="content flex-1">
         <div
           ref={infoPanelRef}
           className={`info-panel ${isInfoOpen ? "open" : ""}`}
@@ -411,11 +482,6 @@ export default function FightSchedule({ fights }: Props) {
             </a>
           </p>
           <br />
-          <p><strong>Legal Notice</strong></p>
-          <p>Name: Marco Lindner</p>
-          <p>Location: Salzburg, Austria</p>
-          <p>Email: marcovlindner@gmx.at</p>
-          <p>This is a non-commercial project.</p>
         </div>
 
         <div className="timeline relative">
@@ -439,6 +505,74 @@ export default function FightSchedule({ fights }: Props) {
           </div>
         </div>
       </main>
+      <footer className="pt-14 pb-6 text-center">
+        <button
+          type="button"
+          onClick={() => {
+            setLegalModal("imprint");
+            setIsLegalModalClosing(false);
+          }}
+          className="text-xs tracking-wide text-neutral-500/60 dark:text-neutral-400/60 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors duration-150"
+        >
+          Imprint
+        </button>
+        <span className="mx-2 text-xs text-neutral-500/40 dark:text-neutral-400/40">•</span>
+        <button
+          type="button"
+          onClick={() => {
+            setLegalModal("privacy");
+            setIsLegalModalClosing(false);
+          }}
+          className="text-xs tracking-wide text-neutral-500/60 dark:text-neutral-400/60 hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors duration-150"
+        >
+          Privacy
+        </button>
+      </footer>
+      {legalModal ? (
+        <div
+          className={`fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 backdrop-blur-[4px] px-4 py-8 ${
+            isLegalModalClosing ? "legal-overlay-exit" : "legal-overlay-enter"
+          }`}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              closeLegalModal();
+            }
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-label={legalModal === "imprint" ? "Imprint" : "Privacy Policy"}
+        >
+          <div
+            className={`relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl border border-neutral-200/70 bg-white/88 text-neutral-900 dark:border-white/10 dark:bg-neutral-900/80 dark:text-neutral-100 backdrop-blur-md p-10 shadow-2xl ${
+              isLegalModalClosing ? "legal-modal-exit" : "legal-modal-enter"
+            }`}
+          >
+            <button
+              type="button"
+              onClick={closeLegalModal}
+              className="absolute top-5 right-5 flex h-8 w-8 items-center justify-center rounded-full text-neutral-500 hover:bg-black/5 hover:text-neutral-900 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-white transition-colors duration-150"
+              aria-label="Close"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              >
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+            {legalModal === "imprint" ? (
+              <ImprintContent />
+            ) : (
+              <PrivacyContent lastUpdated={privacyLastUpdated} />
+            )}
+          </div>
+        </div>
+      ) : null}
       <div className="fade-top" />
       <div className="fade-bottom" />
     </section>

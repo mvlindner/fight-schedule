@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="no-top-fade no-transition min-h-full flex flex-col">
+      <body className="dark no-top-fade no-transition min-h-full flex flex-col">
         <TransitionMount />
         {children}
       </body>

@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-const fs = require("fs");
-const path = require("path");
 const cheerio = require("cheerio");
 const { chromium } = require("playwright");
+const { loadFightStore, saveFightStore, applyStatuses } = require("./scripts/fightStore");
 
-const FILE_PATH = path.join(__dirname, "data", "fights.json");
 const BOXINGSCENE_URL = "https://www.boxingscene.com/schedule";
 const MONTHS = {
   jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
@@ -26,7 +24,8 @@ function normalizeNameForMatch(value) {
 }
 
 async function run() {
-  const fights = JSON.parse(fs.readFileSync(FILE_PATH, "utf8"));
+  const store = loadFightStore();
+  const fights = Object.values(store.fights || {});
   const browser = await chromium.launch({ headless: true });
   let html = "";
 
@@ -70,25 +69,48 @@ async function run() {
   const $ = cheerio.load(html);
   const events = [];
   const seenEventUrls = new Set();
+  let rawEventsScanned = 0;
+  let invalidFights = 0;
+  let duplicateFights = 0;
 
   $('a[href^="/events/"]').each((_, linkEl) => {
+    rawEventsScanned += 1;
     const href = normalize($(linkEl).attr("href"));
-    if (!href || seenEventUrls.has(href)) return;
+    if (!href) {
+      invalidFights += 1;
+      return;
+    }
+    if (seenEventUrls.has(href)) {
+      duplicateFights += 1;
+      return;
+    }
     seenEventUrls.add(href);
 
     const card = $(linkEl).closest(".card");
     const text = normalize(card.text());
-    if (!text.toLowerCase().includes(" vs ")) return;
+    if (!text.toLowerCase().includes(" vs ")) {
+      invalidFights += 1;
+      return;
+    }
 
     const dateMatch = text.match(
       /(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s*\|\s*([A-Za-z]{3})\s+(\d{1,2}),\s*(\d{4})\s*\|/i,
     );
-    if (!dateMatch) return;
+    if (!dateMatch) {
+      invalidFights += 1;
+      return;
+    }
     const timeMatch = text.match(/\|\s*(\d{1,2}(?::\d{2})?\s*(?:AM|PM)|\d{1,2}:\d{2})\b/i);
-    if (!timeMatch) return;
+    if (!timeMatch) {
+      invalidFights += 1;
+      return;
+    }
 
     const month = MONTHS[dateMatch[2].toLowerCase()];
-    if (!month) return;
+    if (!month) {
+      invalidFights += 1;
+      return;
+    }
     const day = Number(dateMatch[3]);
     const year = Number(dateMatch[4]);
     events.push({
@@ -97,11 +119,12 @@ async function run() {
       timeString: normalize(timeMatch[1]).toUpperCase(),
     });
   });
-
-  console.log("Events found:", events.length);
+  const validFightsExtracted = events.length;
 
   let updated = 0;
+  let unchanged = 0;
   let skipped = 0;
+  let exampleEnrichedFight = null;
 
   for (const fight of fights) {
     const red = normalizeNameForMatch(fight?.fighters?.red);
@@ -164,15 +187,44 @@ async function run() {
       continue;
     }
 
+    if (fight.dateUTC === finalUTC) {
+      unchanged += 1;
+      continue;
+    }
+
+    if (!exampleEnrichedFight) {
+      exampleEnrichedFight = {
+        id: fight.id,
+        from: fight.dateUTC,
+        to: finalUTC,
+      };
+    }
     fight.dateUTC = finalUTC;
     updated += 1;
   }
 
-  fs.mkdirSync(path.dirname(FILE_PATH), { recursive: true });
-  fs.writeFileSync(FILE_PATH, JSON.stringify(fights, null, 2), "utf8");
+  const nextStore = { fights: {} };
+  for (const fight of fights) {
+    if (!fight?.id) {
+      continue;
+    }
+    nextStore.fights[fight.id] = fight;
+  }
+  saveFightStore(applyStatuses(nextStore));
 
-  console.log(`Updated ${updated} fights with times`);
-  console.log(`Skipped ${skipped} fights`);
+ const result = {
+  source: "enrich",
+  rawEventsScanned,
+  validFightsExtracted,
+  invalidFights,
+  duplicateFights,
+  updated,
+  unchanged,
+  skipped,
+  exampleEnrichedFight,
+};
+
+console.log(JSON.stringify(result));
 }
 
 run().catch((error) => {

@@ -10,11 +10,11 @@ type Props = {
 };
 
 export default function ThemeToggle({ className }: Props) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
     const savedTheme = localStorage.getItem(STORAGE_KEY);
-    const nextTheme: Theme = savedTheme === "dark" ? "dark" : "light";
+    const nextTheme: Theme = savedTheme === "light" ? "light" : "dark";
     const frameId = window.requestAnimationFrame(() => {
       setTheme(nextTheme);
     });
