@@ -5,6 +5,7 @@ import type { Fight } from "@/lib/time";
 
 type ScrapedFight = {
   sport?: string;
+  status?: string;
   eventName?: string | null;
   location?: string | null;
   broadcaster?: string | null;
@@ -37,6 +38,7 @@ function normalizeFight(raw: unknown): Fight | null {
   }
 
   const candidate = raw as Partial<Fight> & ScrapedFight;
+  const status = candidate.status === "past" ? "past" : "upcoming";
 
   if (
     typeof candidate.date === "string" &&
@@ -53,6 +55,7 @@ function normalizeFight(raw: unknown): Fight | null {
       fighters: [candidate.fighters[0], candidate.fighters[1]],
       link: candidate.link,
       promotion: candidate.promotion === "ufc" ? "ufc" : "boxing",
+      status,
       eventName: candidate.eventName ?? undefined,
       location: candidate.location ?? undefined,
       broadcaster: candidate.broadcaster ?? undefined,
@@ -77,6 +80,7 @@ function normalizeFight(raw: unknown): Fight | null {
       fighters: [candidate.fighters.red, candidate.fighters.blue],
       link: candidate.link,
       promotion: sport === "ufc" || sport === "mma" ? "ufc" : "boxing",
+      status,
       eventName: candidate.eventName ?? undefined,
       location: candidate.location ?? undefined,
       broadcaster: candidate.broadcaster ?? undefined,

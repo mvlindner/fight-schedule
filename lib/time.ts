@@ -9,6 +9,7 @@ export type Fight = {
   fighters: [string, string];
   link: string;
   promotion: "boxing" | "ufc";
+  status?: "upcoming" | "past";
   eventName?: string;
   location?: string;
   broadcaster?: string;
@@ -89,19 +90,24 @@ export function getHighlightedFights(
       getUtcDateTime(b.date, b.time_utc).toMillis(),
   );
 
-  const tonightFights = sorted.filter((fight) => {
-    const fightDateUtc = `${fight.date}T${fight.time_utc}:00Z`;
-    return isSameDay(fightDateUtc, timezone);
+  const now = currentDate ?? getNow();
+  const nowMillis = now.getTime();
+  const currentLocalDateKey = getCurrentLocalDateKey(timezone);
+
+  const upcomingFights = sorted.filter(
+    (fight) => getUtcDateTime(fight.date, fight.time_utc).toMillis() > nowMillis,
+  );
+
+  const tonightFights = upcomingFights.filter((fight) => {
+    const dateKey = getLocalDateKey(fight.date, fight.time_utc, timezone);
+    return dateKey === currentLocalDateKey;
   });
 
   if (tonightFights.length > 0) {
     return { type: "tonight", ids: tonightFights.map(getFightId) };
   }
 
-  const now = currentDate ?? getNow();
-  const nextFight = sorted.find(
-    (fight) => getUtcDateTime(fight.date, fight.time_utc).toJSDate() > now,
-  );
+  const nextFight = upcomingFights[0];
 
   if (nextFight) {
     return { type: "next", ids: [getFightId(nextFight)] };

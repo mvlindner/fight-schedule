@@ -21,6 +21,29 @@ function toDateOnly(fight) {
   return "";
 }
 
+function getScheduledDate(fight) {
+  if (typeof fight?.date === "string" && fight.date) {
+    const dateFromDate = new Date(fight.date);
+    if (!Number.isNaN(dateFromDate.getTime())) {
+      return dateFromDate;
+    }
+  }
+
+  if (typeof fight?.dateUTC === "string" && fight.dateUTC) {
+    const dateFromUtc = new Date(fight.dateUTC);
+    if (!Number.isNaN(dateFromUtc.getTime())) {
+      return dateFromUtc;
+    }
+  }
+
+  const dateOnly = toDateOnly(fight);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+    return new Date(`${dateOnly}T00:00:00.000Z`);
+  }
+
+  return null;
+}
+
 function buildFightId(fight) {
   const red = normalizeIdPart(fight?.fighters?.red);
   const blue = normalizeIdPart(fight?.fighters?.blue);
@@ -32,16 +55,14 @@ function buildFightId(fight) {
 }
 
 function statusFromFightDate(fight, now = new Date()) {
-  const dateOnly = toDateOnly(fight);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) {
+  const scheduledDate = getScheduledDate(fight);
+  if (!scheduledDate) {
     return "upcoming";
   }
 
-  const todayUtc = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
-  const fightUtc = new Date(`${dateOnly}T00:00:00.000Z`);
-  return fightUtc < todayUtc ? "past" : "upcoming";
+  const fightDateWithBuffer = new Date(scheduledDate);
+  fightDateWithBuffer.setHours(fightDateWithBuffer.getHours() + 12);
+  return now > fightDateWithBuffer ? "past" : "upcoming";
 }
 
 function canonicalizeFight(fight) {

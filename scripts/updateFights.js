@@ -228,6 +228,74 @@ function getLinkGaps(store) {
   return gaps;
 }
 
+function getScheduledDateForCleanup(fight) {
+  if (typeof fight?.date === "string" && fight.date) {
+    const dateFromDate = new Date(fight.date);
+    if (!Number.isNaN(dateFromDate.getTime())) {
+      return dateFromDate;
+    }
+  }
+
+  if (typeof fight?.dateUTC === "string" && fight.dateUTC) {
+    const dateFromUtc = new Date(fight.dateUTC);
+    if (!Number.isNaN(dateFromUtc.getTime())) {
+      return dateFromUtc;
+    }
+  }
+
+  return null;
+}
+
+function cleanupFights(store, scrapedFights) {
+  if (!scrapedFights || scrapedFights.length < 3) {
+    console.warn("Skipping deletion: scraper returned too few fights");
+    console.log("Past fights deleted: 0");
+    return { deletedCount: 0, exampleDeleted: null };
+  }
+
+  const scrapedIds = new Set(
+    scrapedFights.map((fight) => String(fight?.id || "").trim()).filter(Boolean),
+  );
+
+  const now = new Date();
+  let deletedCount = 0;
+  let exampleDeleted = null;
+
+  for (const [id, fight] of Object.entries(store.fights || {})) {
+    const scheduledDate = getScheduledDateForCleanup(fight);
+    if (!scheduledDate) {
+      continue;
+    }
+
+    const fightDateWithBuffer = new Date(scheduledDate);
+    fightDateWithBuffer.setHours(fightDateWithBuffer.getHours() + 12);
+
+    const timeSinceFightMs = now - fightDateWithBuffer;
+    const olderThan24hSinceScheduledFight =
+      timeSinceFightMs > 24 * 60 * 60 * 1000;
+
+    const isPast = fight.status === "past";
+    const notInScrape = !scrapedIds.has(id);
+
+    if (isPast && olderThan24hSinceScheduledFight && notInScrape) {
+      if (!exampleDeleted) {
+        const red = fight?.fighters?.red || "Unknown";
+        const blue = fight?.fighters?.blue || "Unknown";
+        exampleDeleted = `${red} vs ${blue}`;
+      }
+      delete store.fights[id];
+      deletedCount += 1;
+    }
+  }
+
+  console.log(`Past fights deleted: ${deletedCount}`);
+  if (deletedCount > 0 && exampleDeleted) {
+    console.log(`Example deleted: ${exampleDeleted}`);
+  }
+
+  return { deletedCount, exampleDeleted };
+}
+
 console.log("Starting fight data update pipeline");
 
 const store = loadFightStore();
@@ -280,14 +348,18 @@ if (enrich.exampleEnrichedFight) {
 
 const finalStore = applyStatuses(loadFightStore());
 const collapsedAfterEnrich = coalesceNearDuplicateFights(finalStore);
+const scrapedFights = [...(espn.fights || []), ...(ufc.fights || [])];
+const cleanup = cleanupFights(finalStore, scrapedFights);
 saveFightStore(finalStore);
 
 const totalFights = Object.keys(finalStore.fights || {}).length;
 const newFightCount = espnMerge.added + ufcMerge.added;
 const mergedUpdates = espnMerge.updated + ufcMerge.updated;
 const enrichmentUpdates = enrich.updated || 0;
+const combinedUpdates = mergedUpdates + enrichmentUpdates;
 const totalChanges = newFightCount + mergedUpdates + enrichmentUpdates + collapsedBeforeEnrich + collapsedAfterEnrich;
-const pipelineStatus = totalChanges > 0 ? "UPDATED" : "OK";
+const totalChangesWithCleanup = totalChanges + cleanup.deletedCount;
+const pipelineStatus = totalChangesWithCleanup > 0 ? "UPDATED" : "OK";
 
 console.log("\nSummary:");
 console.log(
@@ -300,6 +372,7 @@ console.log(
       enrichmentUpdates,
       enrichmentSkippedNoChange: enrich.unchanged || 0,
       deduped: collapsedBeforeEnrich + collapsedAfterEnrich,
+      deletedPastFights: cleanup.deletedCount,
       invalidFights:
         (espn.invalidFights || 0) +
         (ufc.invalidFights || 0) +
@@ -315,11 +388,13 @@ console.log(
     2,
   ),
 );
+console.log("\n================ PIPELINE TOTALS ================");
 console.log(
-  `${totalFights} fights | ${newFightCount} new | ${mergedUpdates} updated | ${enrichmentUpdates} enriched`,
+  `TOTAL: ${totalFights} fights | ${newFightCount} new | ${combinedUpdates} updated | ${cleanup.deletedCount} past deleted`,
 );
-console.log(`Pipeline status: ${pipelineStatus}`);
+console.log(`STATUS: ${pipelineStatus}`);
 console.log(`Completed at: ${new Date().toISOString()}`);
+console.log("================================================");
 
 const linkGaps = getLinkGaps(finalStore);
 if (linkGaps.length > 0) {

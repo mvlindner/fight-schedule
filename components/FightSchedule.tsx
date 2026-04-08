@@ -469,6 +469,7 @@ export default function FightSchedule({ fights }: Props) {
           <p>It helps you keep track of major fights so you don’t miss them.</p>
           <p>All times are shown in your local timezone.</p>
           <p>Times listed are estimated start times for the main event.</p>
+          <p>Past fights remain on the timeline for 24 hours.</p>
           <br />
           <p>
             Buy me a coffee to support ongoing cost:{" "} 

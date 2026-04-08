@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { formatFightTime, type Fight, type TimezoneOption } from "@/lib/time";
+import { formatFightTime, getNow, getUtcDateTime, type Fight, type TimezoneOption } from "@/lib/time";
 
 type Props = {
   fight: Fight;
@@ -23,6 +23,10 @@ export default function FightItem({
   const [fighterA, fighterB] = fight.fighters;
   const formattedTime = formatFightTime(fight.date, fight.time_utc, timezone);
   const matchup = `${fighterA} vs ${fighterB}`;
+  const fallbackPastByTime =
+    getUtcDateTime(fight.date, fight.time_utc).plus({ hours: 12 }).toJSDate() < getNow();
+  const isPastFight = fight.status === "past" || fallbackPastByTime;
+  const leadingLabel = isPastFight ? "PAST" : formattedTime;
   const fightLine =
     fight.promotion === "ufc" && fight.eventName
       ? `${fight.eventName}: ${matchup}`
@@ -65,7 +69,7 @@ export default function FightItem({
                 : "text-neutral-600 dark:text-neutral-400 group-hover:text-violet-600 dark:group-hover:text-red-300"
           }`}
         >
-          {formattedTime}
+          {leadingLabel}
         </span>
         <span
           className={`fight-item-main fight-title transition-colors duration-200 font-medium tracking-tight ${
