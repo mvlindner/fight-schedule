@@ -146,8 +146,6 @@ jobs:
               if (missing.length > sampleLines.length) {
                 descriptionLines.push(`- ...and ${missing.length - sampleLines.length} more`);
               }
-            } else {
-              descriptionLines.push("No missing fight card links.");
             }
 
             const mentionText = process.env.DISCORD_MENTION_USER_ID
@@ -173,7 +171,10 @@ jobs:
                     { name: "Completed At", value: completedAt },
                     { name: "Workflow", value: `[Open Run](${workflowUrl})` },
                   ],
-                  description: descriptionLines.join("\n").slice(0, 1000),
+                  description:
+                    descriptionLines.length > 0
+                      ? descriptionLines.join("\n").slice(0, 1000)
+                      : undefined,
                 },
               ],
             };
