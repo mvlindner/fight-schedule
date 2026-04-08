@@ -4,6 +4,12 @@ on:
   schedule:
     - cron: "15 5 * * *"
   workflow_dispatch:
+    inputs:
+      force_discord_test:
+        description: "Send Discord notification even if fights.json did not change"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -42,6 +48,27 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Decide notification behavior
+        id: notify_decision
+        run: |
+          FORCE_INPUT="${{ github.event.inputs.force_discord_test || 'false' }}"
+          if [ "${{ steps.detect_changes.outputs.changed }}" = "true" ] || [ "$FORCE_INPUT" = "true" ]; then
+            echo "notify=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "notify=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Debug notification state
+        run: |
+          echo "data_changed=${{ steps.detect_changes.outputs.changed }}"
+          echo "force_discord_test=${{ github.event.inputs.force_discord_test || 'false' }}"
+          if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+            echo "discord_webhook_configured=true"
+          else
+            echo "discord_webhook_configured=false"
+          fi
+          echo "will_notify=${{ steps.notify_decision.outputs.notify }}"
+
       - name: Commit and push if data changed
         if: steps.detect_changes.outputs.changed == 'true'
         run: |
@@ -52,9 +79,14 @@ jobs:
           git push
 
       - name: Notify Discord on updates
-        if: steps.detect_changes.outputs.changed == 'true' && env.DISCORD_WEBHOOK_URL != ''
+        if: steps.notify_decision.outputs.notify == 'true' && env.DISCORD_WEBHOOK_URL != ''
         continue-on-error: true
         run: |
+          if [ "${{ steps.detect_changes.outputs.changed }}" = "true" ]; then
+            export NOTIFY_REASON="data-changed"
+          else
+            export NOTIFY_REASON="manual-test"
+          fi
           node <<'NODE'
           const fs = require("fs");
           async function main() {
@@ -85,7 +117,9 @@ jobs:
               });
 
             const summary = [
-              "Fight data updated",
+              process.env.NOTIFY_REASON === "manual-test"
+                ? "Fight data check (manual Discord test)"
+                : "Fight data updated",
               `- Total fights: ${fights.length}`,
               `- Missing fight cards: ${missing.length}`,
               `- Workflow: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
