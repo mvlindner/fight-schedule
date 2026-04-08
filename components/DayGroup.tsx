@@ -31,6 +31,7 @@ export default function DayGroup({
 }: Props) {
   const hasHighlightedFight = fights.some((fight) => highlightedIds.has(getFightId(fight)));
   const hasActiveFight = fights.some((fight) => getFightId(fight) === activeFightId);
+  const lastFightId = fights.length > 0 ? getFightId(fights[fights.length - 1]) : null;
 
   const sectionLabel =
     hasHighlightedFight && highlightType === "tonight"
@@ -96,6 +97,7 @@ export default function DayGroup({
               isHighlighted={highlightedIds.has(fightId)}
               fightId={fightId}
               isActive={activeFightId === fightId}
+              isLastInDay={fightId === lastFightId}
               setActiveFightId={setActiveFightId}
             />
           );

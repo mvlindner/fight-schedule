@@ -8,6 +8,7 @@ type Props = {
   isHighlighted?: boolean;
   fightId: string;
   isActive: boolean;
+  isLastInDay: boolean;
   setActiveFightId: (id: string) => void;
 };
 
@@ -17,6 +18,7 @@ export default function FightCard({
   isHighlighted = false,
   fightId,
   isActive,
+  isLastInDay,
   setActiveFightId,
 }: Props) {
   const TITLE_OFFSET = "calc(3.5rem + 0.5rem)";
@@ -60,7 +62,8 @@ export default function FightCard({
       className="fight-item-row"
       layout
       layoutId={`fight-${fightId}`}
-      transition={{ type: "spring", stiffness: 420, damping: 36, mass: 0.9 }}
+      animate={{ marginBottom: isActive && !isLastInDay ? 24 : 0 }}
+      transition={{ type: "spring", stiffness: 360, damping: 34, mass: 0.95 }}
     >
       <button
         type="button"
