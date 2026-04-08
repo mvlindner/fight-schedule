@@ -120,46 +120,68 @@ jobs:
                 const red = fight?.fighters?.red || "Unknown";
                 const blue = fight?.fighters?.blue || "Unknown";
                 const date = String(fight?.dateUTC || "").slice(0, 10) || "unknown-date";
-                return `- ${red} vs ${blue} (${date})`;
+                return `${red} vs ${blue} (${date})`;
               });
 
-            const summary = [
-              process.env.DISCORD_MENTION_USER_ID
-                ? `<@${process.env.DISCORD_MENTION_USER_ID}>`
-                : null,
-              process.env.NOTIFY_REASON === "manual-test"
-                ? "Fight data check (manual Discord test)"
-                : "Fight data updated",
-              "================ PIPELINE TOTALS ================",
-              `TOTAL: ${
-                summaryFromScript?.totalFights ?? fights.length
-              } fights | ${
-                summaryFromScript?.newFights ?? 0
-              } new | ${
-                summaryFromScript?.updatedFights ?? 0
-              } updated | ${
-                summaryFromScript?.deletedPastFights ?? 0
-              } past deleted`,
-              `STATUS: ${summaryFromScript?.status || "OK"}`,
-              `Completed at: ${summaryFromScript?.completedAt || new Date().toISOString()}`,
-              "================================================",
-              `Missing fight cards: ${summaryFromScript?.missingFightCards ?? missing.length}`,
-              `- Workflow: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
-            ].filter(Boolean);
+            const totalFights = summaryFromScript?.totalFights ?? fights.length;
+            const newFights = summaryFromScript?.newFights ?? 0;
+            const updatedFights = summaryFromScript?.updatedFights ?? 0;
+            const deletedPastFights = summaryFromScript?.deletedPastFights ?? 0;
+            const status = summaryFromScript?.status || "OK";
+            const completedAt = summaryFromScript?.completedAt || new Date().toISOString();
+            const missingFightCards = summaryFromScript?.missingFightCards ?? missing.length;
+            const workflowUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 
+            const title =
+              process.env.NOTIFY_REASON === "manual-test"
+                ? "Fight Data Check (Manual Discord Test)"
+                : "Fight Data Updated";
+
+            const statusColor = status === "UPDATED" ? 16750848 : 5763719;
+
+            const descriptionLines = [];
             if (sampleLines.length > 0) {
-              summary.push("", "Missing link examples:", ...sampleLines);
+              descriptionLines.push("Missing link examples:");
+              descriptionLines.push(...sampleLines.map((line) => `- ${line}`));
               if (missing.length > sampleLines.length) {
-                summary.push(`- ...and ${missing.length - sampleLines.length} more`);
+                descriptionLines.push(`- ...and ${missing.length - sampleLines.length} more`);
               }
+            } else {
+              descriptionLines.push("No missing fight card links.");
             }
 
-            const content = summary.join("\n").slice(0, 1900);
+            const mentionText = process.env.DISCORD_MENTION_USER_ID
+              ? `<@${process.env.DISCORD_MENTION_USER_ID}>`
+              : "";
+
+            const payload = {
+              content: mentionText || undefined,
+              allowed_mentions: process.env.DISCORD_MENTION_USER_ID
+                ? { users: [process.env.DISCORD_MENTION_USER_ID] }
+                : { parse: [] },
+              embeds: [
+                {
+                  title,
+                  color: statusColor,
+                  fields: [
+                    {
+                      name: "Pipeline Totals",
+                      value: `${totalFights} fights | ${newFights} new | ${updatedFights} updated | ${deletedPastFights} past deleted`,
+                    },
+                    { name: "Status", value: status, inline: true },
+                    { name: "Missing Fight Cards", value: String(missingFightCards), inline: true },
+                    { name: "Completed At", value: completedAt },
+                    { name: "Workflow", value: `[Open Run](${workflowUrl})` },
+                  ],
+                  description: descriptionLines.join("\n").slice(0, 1000),
+                },
+              ],
+            };
 
             const res = await fetch(process.env.DISCORD_WEBHOOK_URL, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ content }),
+              body: JSON.stringify(payload),
             });
 
             if (!res.ok) {
