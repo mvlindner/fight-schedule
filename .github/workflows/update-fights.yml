@@ -1,0 +1,114 @@
+﻿name: Update Fights
+
+on:
+  schedule:
+    - cron: "15 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-fights:
+    runs-on: ubuntu-latest
+    env:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run fight update pipeline
+        run: npm run update:fights
+
+      - name: Detect fight data changes
+        id: detect_changes
+        run: |
+          if git diff --quiet -- data/fights.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push if data changed
+        if: steps.detect_changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/fights.json
+          git commit -m "chore(data): automated fight update"
+          git push
+
+      - name: Notify Discord on updates
+        if: steps.detect_changes.outputs.changed == 'true' && env.DISCORD_WEBHOOK_URL != ''
+        run: |
+          node <<'NODE'
+          const fs = require("fs");
+          async function main() {
+            const raw = JSON.parse(fs.readFileSync("data/fights.json", "utf8"));
+            const fights = raw && raw.fights && typeof raw.fights === "object"
+              ? Object.entries(raw.fights).map(([id, fight]) => ({ id, ...(fight || {}) }))
+              : [];
+
+            const placeholderPatterns = [
+              /google\.com\/search/i,
+              /espn\.com\/boxing\/story/i,
+              /espn\.com\/mma\/fightcenter/i,
+            ];
+
+            const missing = fights.filter((fight) => {
+              const link = String(fight?.link || "").trim();
+              if (!link) return true;
+              return placeholderPatterns.some((pattern) => pattern.test(link));
+            });
+
+            const sampleLines = missing
+              .slice(0, 6)
+              .map((fight) => {
+                const red = fight?.fighters?.red || "Unknown";
+                const blue = fight?.fighters?.blue || "Unknown";
+                const date = String(fight?.dateUTC || "").slice(0, 10) || "unknown-date";
+                return `- ${red} vs ${blue} (${date})`;
+              });
+
+            const summary = [
+              "Fight data updated",
+              `- Total fights: ${fights.length}`,
+              `- Missing fight cards: ${missing.length}`,
+              `- Workflow: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+            ];
+
+            if (sampleLines.length > 0) {
+              summary.push("", "Missing link examples:", ...sampleLines);
+              if (missing.length > sampleLines.length) {
+                summary.push(`- ...and ${missing.length - sampleLines.length} more`);
+              }
+            }
+
+            const content = summary.join("\n").slice(0, 1900);
+
+            const res = await fetch(process.env.DISCORD_WEBHOOK_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ content }),
+            });
+
+            if (!res.ok) {
+              const text = await res.text();
+              throw new Error(`Discord webhook failed: ${res.status} ${text}`);
+            }
+          }
+
+          main().catch((err) => {
+            console.error(err);
+            process.exit(1);
+          });
+          NODE
