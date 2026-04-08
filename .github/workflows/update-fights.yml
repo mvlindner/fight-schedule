@@ -50,6 +50,7 @@ jobs:
 
       - name: Notify Discord on updates
         if: steps.detect_changes.outputs.changed == 'true' && env.DISCORD_WEBHOOK_URL != ''
+        continue-on-error: true
         run: |
           node <<'NODE'
           const fs = require("fs");
