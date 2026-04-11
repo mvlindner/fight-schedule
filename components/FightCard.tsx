@@ -58,6 +58,7 @@ export default function FightCard({
     itemRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "center",
+      inline: "nearest",
     });
   };
 
@@ -76,7 +77,7 @@ export default function FightCard({
         className={`fight-item group w-full text-left flex items-baseline gap-2 py-1 origin-left transform-gpu cursor-pointer ${isActive ? "active" : ""}`}
       >
         <span
-          className={`fight-item-time time inline-block w-20 shrink-0 tabular-nums opacity-60 transition-colors duration-200 ${
+          className={`fight-item-time time inline-block w-16 sm:w-20 shrink-0 tabular-nums opacity-60 transition-colors duration-200 ${
             isHighlighted
               ? "text-violet-600 dark:text-red-400"
               : isActive
@@ -87,7 +88,7 @@ export default function FightCard({
           {leadingLabel}
         </span>
         <span
-          className={`fight-item-main fight-title transition-colors duration-200 font-medium tracking-tight ${
+          className={`fight-item-main fight-title min-w-0 flex-1 whitespace-normal break-words transition-colors duration-200 font-medium tracking-tight ${
             isActive
               ? "text-neutral-900 dark:text-neutral-100"
               : "text-neutral-900 dark:text-neutral-100 group-hover:text-violet-600 dark:group-hover:text-red-300"

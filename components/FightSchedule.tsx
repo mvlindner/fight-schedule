@@ -354,7 +354,7 @@ export default function FightSchedule({ fights }: Props) {
 
     hasAppliedInitialFocusRef.current = true;
 
-    highlightedSection.scrollIntoView({ block: "center" });
+    highlightedSection.scrollIntoView({ block: "center", inline: "nearest" });
     window.scrollBy({
       top: Math.round(window.innerHeight * -0.12),
       left: 0,
@@ -622,7 +622,7 @@ export default function FightSchedule({ fights }: Props) {
           aria-label={legalModal === "imprint" ? "Imprint" : "Privacy Policy"}
         >
           <div
-            className={`relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl border border-neutral-200/70 bg-white/88 text-neutral-900 dark:border-white/10 dark:bg-neutral-900/80 dark:text-neutral-100 backdrop-blur-md p-10 shadow-2xl ${
+            className={`legal-modal-scroll relative w-full max-w-3xl max-h-[85vh] overflow-y-auto rounded-l-2xl rounded-r-none border border-neutral-200/70 bg-white/88 text-neutral-900 dark:border-white/10 dark:bg-neutral-900/80 dark:text-neutral-100 backdrop-blur-md p-10 shadow-2xl ${
               isLegalModalClosing ? "legal-modal-exit" : "legal-modal-enter"
             }`}
           >

@@ -23,6 +23,8 @@ html {
   transition: background-color 180ms ease-out, color 180ms ease-out;
   scrollbar-gutter: stable both-edges;
   overflow-y: scroll;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 h1,
@@ -98,6 +100,7 @@ p {
     opacity 0.25s ease,
     filter 0.25s ease;
   will-change: transform, opacity;
+  touch-action: manipulation;
 }
 
 .timeline-container {
@@ -111,6 +114,8 @@ p {
 .fight-title {
   font-size: calc(22px * var(--ui-scale));
   line-height: 1.2;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .time {
@@ -131,6 +136,10 @@ p {
   transform: scale(0.98);
   opacity: 0.7;
   filter: blur(0);
+}
+
+.fight-item:active {
+  transform: scale(1.04);
 }
 
 .fight-item:not(.active):hover .fight-item-main {
@@ -334,6 +343,8 @@ body {
   );
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
     sans-serif;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .fade-top,
@@ -462,8 +473,71 @@ body {
   animation: legalModalOut 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.legal-modal-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(115, 115, 115, 0.85) rgba(0, 0, 0, 0.08);
+  color-scheme: light;
+}
+
+.legal-modal-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.legal-modal-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 9999px;
+}
+
+.legal-modal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(115, 115, 115, 0.85);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.dark .legal-modal-scroll {
+  scrollbar-color: rgba(161, 161, 170, 0.75) rgba(255, 255, 255, 0.07);
+  color-scheme: dark;
+}
+
+.dark .legal-modal-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.dark .legal-modal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(161, 161, 170, 0.75);
+  background-clip: content-box;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .timeline-container {
+    overflow-x: clip;
+  }
+
+  .fight-item.active,
+  .fight-item.active:hover {
+    transform: scale(1.05);
+  }
+
+  .fight-item:active {
+    transform: scale(1.02);
+  }
+
+  .has-active .fight-item:not(.active) {
+    transform: scale(0.98);
+  }
+
+  .fight-meta.visible {
+    max-height: 84px;
+  }
+
+  .fight-meta-inner {
+    white-space: normal;
   }
 }

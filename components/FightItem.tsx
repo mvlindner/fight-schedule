@@ -55,6 +55,7 @@ export default function FightItem({
     itemRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "center",
+      inline: "nearest",
     });
   };
 
@@ -77,7 +78,7 @@ export default function FightItem({
           {leadingLabel}
         </span>
         <span
-          className={`fight-item-main fight-title transition-colors duration-200 font-medium tracking-tight ${
+          className={`fight-item-main fight-title min-w-0 flex-1 whitespace-normal break-words transition-colors duration-200 font-medium tracking-tight ${
             isActive
               ? "text-neutral-900 dark:text-neutral-100"
               : "text-neutral-900 dark:text-neutral-100 group-hover:text-violet-600 dark:group-hover:text-red-300"
