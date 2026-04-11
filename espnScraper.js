@@ -42,6 +42,69 @@ function cleanFighterName(name) {
   return normalizeWhitespace(name).replace(/^title fight:\s*/i, "");
 }
 
+function extractTitleInfo(fightersChunk) {
+  const normalized = normalizeWhitespace(fightersChunk);
+  const isTitleFight = /^title fight:\s*/i.test(normalized);
+  if (!isTitleFight) {
+    return { isTitleFight: false, titleDetails: undefined, titleLabel: undefined };
+  }
+
+  const detailsMatch = normalized.match(/,\s*for\s+(.+)$/i);
+  const titleDetails = detailsMatch
+    ? normalizeWhitespace(detailsMatch[1]).replace(/[.;]\s*$/, "")
+    : undefined;
+
+  const titleLabel = buildCompactTitleLabel(titleDetails);
+  return { isTitleFight: true, titleDetails, titleLabel };
+}
+
+function toTitleCase(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/(^|[\s-])([a-z])/g, (_, lead, ch) => `${lead}${ch.toUpperCase()}`)
+    .replace(/'S\b/g, "'s")
+    .trim();
+}
+
+function buildCompactTitleLabel(titleDetails) {
+  const details = normalizeWhitespace(titleDetails || "");
+  if (!details) {
+    return "Title Fight";
+  }
+
+  const undisputedMatch = details.match(
+    /undisputed\s+([a-z' -]+?)\s+(?:title|titles|championship|championships)/i,
+  );
+  if (undisputedMatch?.[1]) {
+    return `Undisputed ${toTitleCase(undisputedMatch[1])} Title`;
+  }
+
+  const sanctioningBodies = ["WBO", "WBC", "WBA", "IBF", "IBO", "RING"];
+  const body =
+    sanctioningBodies.find((abbr) => new RegExp(`\\b${abbr}\\b`, "i").test(details)) || null;
+
+  const divisionMatch = details.match(
+    /(?:WBO|WBC|WBA|IBF|IBO|RING)(?:\s*,\s*|\s+and\s+|\s*&\s*|\s+)*(?:WBO|WBC|WBA|IBF|IBO|RING)?(?:\s*,\s*|\s+and\s+|\s*&\s*|\s+)*(?:WBO|WBC|WBA|IBF|IBO|RING)?\s+([a-z' -]+?)\s+(?:title|titles|championship|championships)/i,
+  );
+
+  const fallbackDivisionMatch = details.match(
+    /([a-z' -]+?)\s+(?:title|titles|championship|championships)/i,
+  );
+  const division = divisionMatch?.[1] || fallbackDivisionMatch?.[1];
+  const divisionText = division ? toTitleCase(division) : "";
+
+  if (body && divisionText) {
+    return `${body.toUpperCase()} ${divisionText} Title`;
+  }
+  if (body) {
+    return `${body.toUpperCase()} Title`;
+  }
+  if (divisionText) {
+    return `${divisionText} Title`;
+  }
+  return "Title Fight";
+}
+
 function parseListItem(text) {
   const normalized = normalizeWhitespace(text);
   const parts = normalized.split("--");
@@ -67,6 +130,7 @@ function parseListItem(text) {
 
   const red = cleanFighterName(vsMatch[1]);
   const blue = cleanFighterName(vsMatch[2]);
+  const titleInfo = extractTitleInfo(fightersChunk);
   const broadcasterMatch = metadata.match(/\(([^)]+)\)\s*$/);
   const broadcaster = normalizeWhitespace(broadcasterMatch?.[1] || "");
   const locationPart = metadata.split(":")[1] || "";
@@ -88,6 +152,9 @@ function parseListItem(text) {
     dateUTC,
     location: location || undefined,
     broadcaster: broadcaster || undefined,
+    isTitleFight: titleInfo.isTitleFight,
+    titleDetails: titleInfo.titleDetails,
+    titleLabel: titleInfo.titleLabel,
     link: ESPN_URL,
   };
 }

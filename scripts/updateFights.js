@@ -10,6 +10,7 @@ const {
   applyStatuses,
   buildFightId,
 } = require("./fightStore");
+const MANUAL_FIGHTS_PATH = path.join(__dirname, "..", "data", "manualFights.json");
 
 function normalizeName(value) {
   return String(value || "")
@@ -149,6 +150,99 @@ function runStep(name, command) {
     console.error(`Failed: ${name}`);
     process.exit(1);
   }
+}
+
+function loadManualFightEntries() {
+  if (!fs.existsSync(MANUAL_FIGHTS_PATH)) {
+    return { entries: [], parseError: false, invalidShape: false };
+  }
+
+  try {
+    const raw = JSON.parse(fs.readFileSync(MANUAL_FIGHTS_PATH, "utf8"));
+    if (Array.isArray(raw)) {
+      return { entries: raw, parseError: false, invalidShape: false };
+    }
+    if (raw && Array.isArray(raw.fights)) {
+      return { entries: raw.fights, parseError: false, invalidShape: false };
+    }
+    return { entries: [], parseError: false, invalidShape: true };
+  } catch {
+    return { entries: [], parseError: true, invalidShape: false };
+  }
+}
+
+function writeManualFightEntries(entries) {
+  fs.mkdirSync(path.dirname(MANUAL_FIGHTS_PATH), { recursive: true });
+  fs.writeFileSync(
+    MANUAL_FIGHTS_PATH,
+    `${JSON.stringify({ fights: entries }, null, 2)}\n`,
+    "utf8",
+  );
+}
+
+function isOlderThan24hAfterFightWindow(fight, now = new Date()) {
+  const scheduledDate = getScheduledDateForCleanup(fight);
+  if (!scheduledDate) {
+    return false;
+  }
+
+  const fightDateWithBuffer = new Date(scheduledDate);
+  fightDateWithBuffer.setHours(fightDateWithBuffer.getHours() + 12);
+  return now - fightDateWithBuffer > 24 * 60 * 60 * 1000;
+}
+
+function pruneManualFightEntries(entries) {
+  const now = new Date();
+  const keptEntries = [];
+  let deletedCount = 0;
+  let exampleDeleted = null;
+
+  for (const entry of entries) {
+    if (isOlderThan24hAfterFightWindow(entry, now)) {
+      if (!exampleDeleted) {
+        const red = entry?.fighters?.red || "Unknown";
+        const blue = entry?.fighters?.blue || "Unknown";
+        exampleDeleted = `${red} vs ${blue}`;
+      }
+      deletedCount += 1;
+      continue;
+    }
+    keptEntries.push(entry);
+  }
+
+  return { keptEntries, deletedCount, exampleDeleted };
+}
+
+function normalizeManualFights(entries) {
+  const fights = [];
+  let invalid = 0;
+
+  for (const entry of entries) {
+    const sport = String(entry?.sport || "").trim().toLowerCase();
+    const red = String(entry?.fighters?.red || "").trim();
+    const blue = String(entry?.fighters?.blue || "").trim();
+    const dateUTC = String(entry?.dateUTC || "").trim();
+    if (!sport || !red || !blue || !dateUTC) {
+      invalid += 1;
+      continue;
+    }
+
+    fights.push({
+      id: buildFightId({ fighters: { red, blue }, dateUTC }),
+      sport,
+      eventName: entry?.eventName ?? null,
+      fighters: { red, blue },
+      dateUTC,
+      location: entry?.location || undefined,
+      broadcaster: entry?.broadcaster || undefined,
+      isTitleFight: entry?.isTitleFight === true,
+      titleLabel: entry?.titleLabel || undefined,
+      titleDetails: entry?.titleDetails || undefined,
+      link: entry?.link || undefined,
+    });
+  }
+
+  return { fights, invalid };
 }
 
 function mergeScrapedFights(store, scrapedFights, sourceName) {
@@ -348,6 +442,30 @@ if (!espnMerge.exampleUpdatedFight && !ufcMerge.exampleUpdatedFight) {
   console.log("Example updated fight: none (no merge changes)");
 }
 
+const manualSource = loadManualFightEntries();
+if (manualSource.parseError) {
+  console.warn("Manual overrides file parse failed; continuing with 0 manual fights.");
+}
+if (manualSource.invalidShape) {
+  console.warn("Manual overrides file shape invalid; expected array or { fights: [] }.");
+}
+const manualPrune = pruneManualFightEntries(manualSource.entries);
+if (manualPrune.deletedCount > 0) {
+  writeManualFightEntries(manualPrune.keptEntries);
+}
+console.log(
+  `Manual overrides pruned: ${manualPrune.deletedCount} removed (past +24h)` +
+    (manualPrune.exampleDeleted ? ` | Example: ${manualPrune.exampleDeleted}` : ""),
+);
+const manual = normalizeManualFights(manualPrune.keptEntries);
+const manualMerge = mergeScrapedFights(store, manual.fights || [], "manual overrides");
+console.log(
+  `Manual overrides loaded: ${manual.fights.length} valid | ${manual.invalid || 0} invalid`,
+);
+console.log(
+  `Merge result: +${manualMerge.added} new | ~${manualMerge.updated} updated | =${manualMerge.skipped} unchanged`,
+);
+
 const collapsedBeforeEnrich = coalesceNearDuplicateFights(store);
 saveFightStore(applyStatuses(store));
 
@@ -365,16 +483,22 @@ if (enrich.exampleEnrichedFight) {
 
 const finalStore = applyStatuses(loadFightStore());
 const collapsedAfterEnrich = coalesceNearDuplicateFights(finalStore);
-const scrapedFights = [...(espn.fights || []), ...(ufc.fights || [])];
+const scrapedFights = [...(espn.fights || []), ...(ufc.fights || []), ...(manual.fights || [])];
 const cleanup = cleanupFights(finalStore, scrapedFights);
 saveFightStore(finalStore);
 
 const totalFights = Object.keys(finalStore.fights || {}).length;
-const newFightCount = espnMerge.added + ufcMerge.added;
-const mergedUpdates = espnMerge.updated + ufcMerge.updated;
+const newFightCount = espnMerge.added + ufcMerge.added + manualMerge.added;
+const mergedUpdates = espnMerge.updated + ufcMerge.updated + manualMerge.updated;
 const enrichmentUpdates = enrich.updated || 0;
 const combinedUpdates = mergedUpdates + enrichmentUpdates;
-const totalChanges = newFightCount + mergedUpdates + enrichmentUpdates + collapsedBeforeEnrich + collapsedAfterEnrich;
+const totalChanges =
+  newFightCount +
+  mergedUpdates +
+  enrichmentUpdates +
+  collapsedBeforeEnrich +
+  collapsedAfterEnrich +
+  manualPrune.deletedCount;
 const totalChangesWithCleanup = totalChanges + cleanup.deletedCount;
 const pipelineStatus = totalChangesWithCleanup > 0 ? "UPDATED" : "OK";
 const completedAt = new Date().toISOString();
@@ -386,15 +510,18 @@ console.log(
       totalFights,
       newFights: newFightCount,
       mergedUpdates,
-      mergedSkippedNoChange: (espnMerge.skipped || 0) + (ufcMerge.skipped || 0),
+      mergedSkippedNoChange:
+        (espnMerge.skipped || 0) + (ufcMerge.skipped || 0) + (manualMerge.skipped || 0),
       enrichmentUpdates,
       enrichmentSkippedNoChange: enrich.unchanged || 0,
       deduped: collapsedBeforeEnrich + collapsedAfterEnrich,
       deletedPastFights: cleanup.deletedCount,
+      deletedManualOverrides: manualPrune.deletedCount,
       invalidFights:
         (espn.invalidFights || 0) +
         (ufc.invalidFights || 0) +
-        (enrich.invalidFights || 0),
+        (enrich.invalidFights || 0) +
+        (manual.invalid || 0),
       duplicateFights:
         (espn.duplicateFights || 0) +
         (ufc.duplicateFights || 0) +
@@ -410,6 +537,7 @@ console.log("\n================ PIPELINE TOTALS ================");
 console.log(
   `TOTAL: ${totalFights} fights | ${newFightCount} new | ${combinedUpdates} updated | ${cleanup.deletedCount} past deleted`,
 );
+console.log(`MANUAL OVERRIDES PRUNED: ${manualPrune.deletedCount}`);
 console.log(`STATUS: ${pipelineStatus}`);
 console.log(`Completed at: ${completedAt}`);
 console.log("================================================");
@@ -433,6 +561,7 @@ writePipelineSummary({
   newFights: newFightCount,
   updatedFights: combinedUpdates,
   deletedPastFights: cleanup.deletedCount,
+  deletedManualOverrides: manualPrune.deletedCount,
   status: pipelineStatus,
   completedAt,
   missingFightCards: linkGaps.length,

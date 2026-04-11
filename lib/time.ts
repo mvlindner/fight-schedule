@@ -14,6 +14,9 @@ export type Fight = {
   eventName?: string;
   location?: string;
   broadcaster?: string;
+  isTitleFight?: boolean;
+  titleLabel?: string;
+  titleDetails?: string;
 };
 
 export type HighlightType = "tonight" | "next" | null;

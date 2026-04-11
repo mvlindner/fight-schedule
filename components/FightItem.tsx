@@ -1,4 +1,4 @@
-import { useRef } from "react";
+﻿import { useRef } from "react";
 import { formatFightTime, getNow, getUtcDateTime, type Fight, type TimezoneOption } from "@/lib/time";
 
 type Props = {
@@ -40,7 +40,12 @@ export default function FightItem({
   })();
   const hasLocation = Boolean(fight.location);
   const hasBroadcaster = Boolean(broadcaster);
-  const hasMetaPrefix = hasLocation || hasBroadcaster;
+  const compactTitleLabel =
+    fight.promotion === "boxing" && fight.isTitleFight && fight.titleLabel
+      ? fight.titleLabel
+      : "";
+  const hasTitleLabel = Boolean(compactTitleLabel);
+  const hasMetaPrefix = hasLocation || hasBroadcaster || hasTitleLabel;
 
   const handleActivate = () => {
     if (isActive) {
@@ -94,9 +99,13 @@ export default function FightItem({
               <span className="meta-location">{fight.location}</span>
             </>
           )}
-          {hasLocation && hasBroadcaster && <span className="meta-separator"> • </span>}
+          {hasLocation && hasBroadcaster && <span className="meta-separator"> {"\u2022"} </span>}
           {hasBroadcaster && <span className="meta-broadcaster">{broadcaster}</span>}
-          {hasMetaPrefix && <span className="meta-separator"> • </span>}
+          {(hasLocation || hasBroadcaster) && hasTitleLabel && (
+            <span className="meta-separator"> {"\u2022"} </span>
+          )}
+          {hasTitleLabel && <span className="meta-title">{compactTitleLabel}</span>}
+          {hasMetaPrefix && <span className="meta-separator"> {"\u2022"} </span>}
           <a
             href={fight.link}
             target="_blank"

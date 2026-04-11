@@ -10,6 +10,9 @@ type ScrapedFight = {
   eventName?: string | null;
   location?: string | null;
   broadcaster?: string | null;
+  isTitleFight?: boolean;
+  titleLabel?: string | null;
+  titleDetails?: string | null;
   fighters?: {
     red?: string;
     blue?: string;
@@ -62,6 +65,9 @@ function normalizeFight(raw: unknown): Fight | null {
       eventName: candidate.eventName ?? undefined,
       location: candidate.location ?? undefined,
       broadcaster: candidate.broadcaster ?? undefined,
+      isTitleFight: candidate.isTitleFight === true,
+      titleLabel: candidate.titleLabel ?? undefined,
+      titleDetails: candidate.titleDetails ?? undefined,
     };
   }
 
@@ -88,6 +94,9 @@ function normalizeFight(raw: unknown): Fight | null {
       eventName: candidate.eventName ?? undefined,
       location: candidate.location ?? undefined,
       broadcaster: candidate.broadcaster ?? undefined,
+      isTitleFight: candidate.isTitleFight === true,
+      titleLabel: candidate.titleLabel ?? undefined,
+      titleDetails: candidate.titleDetails ?? undefined,
     };
   }
 
