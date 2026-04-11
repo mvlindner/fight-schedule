@@ -152,7 +152,9 @@
       "broadcaster": "DAZN",
       "link": "https://www.tapology.com/fightcenter/events/139645-wardley-vs-dubois",
       "status": "upcoming",
-      "isTitleFight": false
+      "isTitleFight": true,
+      "titleLabel": "WBO Heavyweight Title",
+      "titleDetails": "Wardley's WBO heavyweight title"
     }
   }
 }
