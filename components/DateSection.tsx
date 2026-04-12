@@ -38,10 +38,10 @@ export default function DateSection({
 
   return (
     <section
-      className="day-group space-y-3"
+      className={`day-group space-y-3 ${hasActiveFight ? "is-active" : ""}`}
       data-highlighted-section={hasHighlightedFight ? "true" : undefined}
     >
-      <div className="relative">
+      <div className="day-group-header relative">
         <div className="pointer-events-none absolute -left-10 top-0 h-full w-10">
           <div
             className={`timeline-dot absolute left-[6px] top-1/2 h-[7px] w-[7px] -translate-x-[45%] -translate-y-1/2 rounded-full ${

@@ -132,6 +132,18 @@ p {
   filter: blur(1px);
 }
 
+.day-group-header {
+  transition:
+    opacity 0.25s ease,
+    filter 0.25s ease;
+  will-change: opacity, filter;
+}
+
+.has-active .day-group:not(.is-active) .day-group-header {
+  opacity: 0.5;
+  filter: blur(1px);
+}
+
 .fight-item:not(.active):hover {
   transform: scale(0.98);
   opacity: 0.7;

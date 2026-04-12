@@ -42,10 +42,10 @@ export default function DayGroup({
 
   return (
     <section
-      className="day-group space-y-3"
+      className={`day-group space-y-3 ${hasActiveFight ? "is-active" : ""}`}
       data-highlighted-section={hasHighlightedFight ? "true" : undefined}
     >
-      <div className="relative">
+      <div className="day-group-header relative">
         <div className="pointer-events-none absolute -left-10 top-0 h-full w-10">
           <motion.div
             initial={animateTimeline ? { opacity: 0, scale: 0.75, y: 4 } : false}
