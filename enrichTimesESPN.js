@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const cheerio = require("cheerio");
 const { chromium } = require("playwright");
+const fs = require("fs");
+const path = require("path");
 const { loadFightStore, saveFightStore, applyStatuses } = require("./scripts/fightStore");
+const { buildFightId } = require("./scripts/fightStore");
 
 const BOXINGSCENE_URL = "https://www.boxingscene.com/schedule";
+const MANUAL_FIGHTS_PATH = path.join(__dirname, "data", "manualFights.json");
 const MONTHS = {
   jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
   jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
@@ -23,9 +27,33 @@ function normalizeNameForMatch(value) {
     .trim();
 }
 
+function loadManualOverrideIds() {
+  if (!fs.existsSync(MANUAL_FIGHTS_PATH)) {
+    return new Set();
+  }
+
+  try {
+    const raw = JSON.parse(fs.readFileSync(MANUAL_FIGHTS_PATH, "utf8"));
+    const entries = Array.isArray(raw) ? raw : Array.isArray(raw?.fights) ? raw.fights : [];
+    const ids = new Set();
+
+    for (const entry of entries) {
+      const id = buildFightId(entry);
+      if (id) {
+        ids.add(id);
+      }
+    }
+
+    return ids;
+  } catch {
+    return new Set();
+  }
+}
+
 async function run() {
   const store = loadFightStore();
   const fights = Object.values(store.fights || {});
+  const manualOverrideIds = loadManualOverrideIds();
   const browser = await chromium.launch({ headless: true });
   let html = "";
 
@@ -124,9 +152,15 @@ async function run() {
   let updated = 0;
   let unchanged = 0;
   let skipped = 0;
+  let skippedManualOverrides = 0;
   let exampleEnrichedFight = null;
 
   for (const fight of fights) {
+    if (manualOverrideIds.has(String(fight?.id || ""))) {
+      skippedManualOverrides += 1;
+      continue;
+    }
+
     const red = normalizeNameForMatch(fight?.fighters?.red);
     const blue = normalizeNameForMatch(fight?.fighters?.blue);
     const date = String(fight?.dateUTC || "").slice(0, 10);
@@ -221,6 +255,7 @@ async function run() {
   updated,
   unchanged,
   skipped,
+  skippedManualOverrides,
   exampleEnrichedFight,
 };
 
