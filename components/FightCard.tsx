@@ -1,6 +1,6 @@
 ﻿import { useRef } from "react";
 import { motion } from "framer-motion";
-import { formatFightTime, getNow, getUtcDateTime, type Fight, type TimezoneOption } from "@/lib/time";
+import { formatFightTime, getFightDisplayStatus, type Fight, type TimezoneOption } from "@/lib/time";
 
 type Props = {
   fight: Fight;
@@ -26,10 +26,10 @@ export default function FightCard({
   const [fighterA, fighterB] = fight.fighters;
   const formattedTime = formatFightTime(fight.date, fight.time_utc, timezone);
   const matchup = `${fighterA} vs ${fighterB}`;
-  const fallbackPastByTime =
-    getUtcDateTime(fight.date, fight.time_utc).plus({ hours: 12 }).toJSDate() < getNow();
-  const isPastFight = fight.status === "past" || fallbackPastByTime;
-  const leadingLabel = isPastFight ? "PAST" : formattedTime;
+  const displayStatus = getFightDisplayStatus(fight);
+  const isPastFight = displayStatus === "past";
+  const leadingLabel =
+    isPastFight ? "PAST" : displayStatus === "live" ? "LIVE" : formattedTime;
   const fightLine =
     fight.promotion === "ufc" && fight.eventName
       ? `${fight.eventName}: ${matchup}`
@@ -82,6 +82,8 @@ export default function FightCard({
               ? "text-violet-600 dark:text-red-400"
               : isActive
                 ? "text-neutral-600 dark:text-neutral-400"
+                : isPastFight
+                  ? "text-neutral-500 dark:text-neutral-600 group-hover:text-violet-600 dark:group-hover:text-red-300"
                 : "text-neutral-600 dark:text-neutral-400 group-hover:text-violet-600 dark:group-hover:text-red-300"
           }`}
         >
@@ -91,6 +93,8 @@ export default function FightCard({
           className={`fight-item-main fight-title min-w-0 flex-1 whitespace-normal break-words transition-colors duration-200 font-medium tracking-tight ${
             isActive
               ? "text-neutral-900 dark:text-neutral-100"
+              : isPastFight
+                ? "text-neutral-500 dark:text-neutral-500 group-hover:text-violet-600 dark:group-hover:text-red-300"
               : "text-neutral-900 dark:text-neutral-100 group-hover:text-violet-600 dark:group-hover:text-red-300"
           }`}
         >

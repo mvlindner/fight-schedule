@@ -20,6 +20,7 @@ export type Fight = {
 };
 
 export type HighlightType = "tonight" | "next" | null;
+export type FightDisplayStatus = "upcoming" | "live" | "past";
 
 export type HighlightedFights = {
   type: HighlightType;
@@ -34,6 +35,7 @@ const ZONE_BY_TIMEZONE: Record<TimezoneOption, string> = {
 };
 
 const DEBUG_DATE: string | null = null;
+const LIVE_WINDOW_MINUTES = 75;
 // Example for testing only:
 //const DEBUG_DATE: string | null = "2026-04-06T18:00:00Z";
 
@@ -50,6 +52,32 @@ export function getFightId(fight: Fight): string {
     return fight.id;
   }
   return `${fight.date}-${fight.time_utc}-${fight.fighters[0]}-${fight.fighters[1]}`;
+}
+
+export function getFightDisplayStatus(
+  fight: Fight,
+  currentDate?: Date,
+): FightDisplayStatus {
+  if (fight.status === "past") {
+    return "past";
+  }
+
+  const now = currentDate ?? getNow();
+  const nowMillis = now.getTime();
+  const startMillis = getUtcDateTime(fight.date, fight.time_utc).toMillis();
+  const liveUntilMillis = getUtcDateTime(fight.date, fight.time_utc)
+    .plus({ minutes: LIVE_WINDOW_MINUTES })
+    .toMillis();
+
+  if (nowMillis < startMillis) {
+    return "upcoming";
+  }
+
+  if (nowMillis < liveUntilMillis) {
+    return "live";
+  }
+
+  return "past";
 }
 
 export function formatFightTime(
