@@ -1,20 +1,5 @@
 {
   "fights": {
-    "tysonfuryarslanbekmakhmudov20260411": {
-      "id": "tysonfuryarslanbekmakhmudov20260411",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Tyson Fury",
-        "blue": "Arslanbek Makhmudov"
-      },
-      "dateUTC": "2026-04-11T21:00:00Z",
-      "location": "London",
-      "broadcaster": "Netflix",
-      "link": "https://www.netflix.com/tudum/features/fury-makhmudov-conor-benn-regis-prograis-fight-card",
-      "status": "past",
-      "isTitleFight": false
-    },
     "alyciabaumgardnerbomireshin20260418": {
       "id": "alyciabaumgardnerbomireshin20260418",
       "sport": "boxing",
@@ -109,7 +94,7 @@
       "location": "Miami",
       "broadcaster": "Paramount+CBS",
       "link": "https://www.ufc.com/event/ufc-327",
-      "status": "upcoming"
+      "status": "past"
     },
     "chimaevstrickland20260509": {
       "id": "chimaevstrickland20260509",
