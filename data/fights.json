@@ -82,20 +82,6 @@
       "status": "upcoming",
       "isTitleFight": false
     },
-    "prochzkaulberg20260411": {
-      "id": "prochzkaulberg20260411",
-      "sport": "mma",
-      "eventName": "UFC 327",
-      "fighters": {
-        "red": "Procházka",
-        "blue": "Ulberg"
-      },
-      "dateUTC": "2026-04-11T23:30:00Z",
-      "location": "Miami",
-      "broadcaster": "Paramount+CBS",
-      "link": "https://www.ufc.com/event/ufc-327",
-      "status": "past"
-    },
     "chimaevstrickland20260509": {
       "id": "chimaevstrickland20260509",
       "sport": "mma",
