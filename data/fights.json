@@ -1,22 +1,5 @@
 {
   "fights": {
-    "alyciabaumgardnerbomireshin20260418": {
-      "id": "alyciabaumgardnerbomireshin20260418",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Alycia Baumgardner",
-        "blue": "Bo Mi Re Shin"
-      },
-      "dateUTC": "2026-04-18T05:00:00Z",
-      "location": "New York",
-      "broadcaster": "ESPN",
-      "link": "https://www.tapology.com/fightcenter/events/140682-baumgardner-vs-shin",
-      "status": "past",
-      "isTitleFight": true,
-      "titleDetails": "Baumgardner's IBF, WBO and WBA women's junior lightweight titles - Watch here",
-      "titleLabel": "WBO Women's Junior Lightweight Title"
-    },
     "naoyainouejuntonakatani20260502": {
       "id": "naoyainouejuntonakatani20260502",
       "sport": "boxing",
@@ -25,7 +8,7 @@
         "red": "Naoya Inoue",
         "blue": "Junto Nakatani"
       },
-      "dateUTC": "2026-05-02T07:00:00Z",
+      "dateUTC": "2026-05-02T10:00:00Z",
       "location": "Tokyo",
       "link": "https://www.dazn.com/en-US/news/boxing/naoya-inoue-vs-junto-nakatani-how-to-watch-fight-time-ringwalks-prediction-undercard-news-odds/p833p0ofebd01p5mxlw2chy66",
       "status": "upcoming",
