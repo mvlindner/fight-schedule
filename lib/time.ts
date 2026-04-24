@@ -47,6 +47,10 @@ export function getUtcDateTime(date: string, timeUtc: string): DateTime {
   return DateTime.fromISO(`${date}T${timeUtc}`, { zone: "UTC" });
 }
 
+export function isFightTimeTba(timeUtc: string): boolean {
+  return timeUtc === "00:00";
+}
+
 export function getFightId(fight: Fight): string {
   if (fight.id) {
     return fight.id;
@@ -63,6 +67,10 @@ export function getFightDisplayStatus(
   }
 
   const now = currentDate ?? getNow();
+  if (isFightTimeTba(fight.time_utc)) {
+    return "upcoming";
+  }
+
   const nowMillis = now.getTime();
   const startMillis = getUtcDateTime(fight.date, fight.time_utc).toMillis();
   const liveUntilMillis = getUtcDateTime(fight.date, fight.time_utc)
@@ -85,6 +93,10 @@ export function formatFightTime(
   timeUtc: string,
   timezone: TimezoneOption,
 ): string {
+  if (isFightTimeTba(timeUtc)) {
+    return "TBA";
+  }
+
   return getUtcDateTime(date, timeUtc)
     .setZone(ZONE_BY_TIMEZONE[timezone])
     .toFormat("HH:mm");
@@ -95,6 +107,10 @@ export function getLocalDateKey(
   timeUtc: string,
   timezone: TimezoneOption,
 ): string {
+  if (isFightTimeTba(timeUtc)) {
+    return date;
+  }
+
   return getUtcDateTime(date, timeUtc)
     .setZone(ZONE_BY_TIMEZONE[timezone])
     .toFormat("yyyy-LL-dd");
