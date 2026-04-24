@@ -110,15 +110,15 @@
       "titleLabel": "WBO Heavyweight Title",
       "titleDetails": "Wardley's WBO heavyweight title"
     },
-    "stephaniehanhollyholm20260530": {
-      "id": "stephaniehanhollyholm20260530",
+    "stephaniehanhollyholm20260531": {
+      "id": "stephaniehanhollyholm20260531",
       "sport": "boxing",
       "eventName": null,
       "fighters": {
         "red": "Stephanie Han",
         "blue": "Holly Holm"
       },
-      "dateUTC": "2026-05-30T00:00:00Z",
+      "dateUTC": "2026-05-31T04:00:00Z",
       "location": "El Paso, Texas",
       "broadcaster": "ESPN",
       "isTitleFight": true,
@@ -135,7 +135,7 @@
         "red": "Dmitry Bivol",
         "blue": "Michael Eifert"
       },
-      "dateUTC": "2026-05-30T00:00:00Z",
+      "dateUTC": "2026-05-30T19:00:00Z",
       "location": "Ekaterinburg, Russia",
       "isTitleFight": true,
       "titleDetails": "Bivol's WBA, IBF and WBO light heavyweight titles",
@@ -151,7 +151,7 @@
         "red": "Antonio Vargas",
         "blue": "Jesse \"Bam\" Rodriguez"
       },
-      "dateUTC": "2026-06-13T00:00:00Z",
+      "dateUTC": "2026-06-13T07:00:00Z",
       "location": "Glendale, Arizona",
       "broadcaster": "DAZN",
       "isTitleFight": true,
@@ -168,7 +168,7 @@
         "red": "Xander Zayas",
         "blue": "Jaron Ennis"
       },
-      "dateUTC": "2026-06-27T00:00:00Z",
+      "dateUTC": "2026-06-27T07:00:00Z",
       "location": "Brooklyn, New York",
       "broadcaster": "DAZN",
       "isTitleFight": true,
