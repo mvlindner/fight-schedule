@@ -7,6 +7,19 @@ const ESPN_URL =
   "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule";
 const CURRENT_YEAR = 2026;
 
+function emptyResult(reason) {
+  return {
+    source: "espn",
+    rawEventsScanned: 0,
+    validFightsExtracted: 0,
+    invalidFights: 0,
+    duplicateFights: 0,
+    sourceUnavailable: true,
+    sourceUnavailableReason: reason,
+    fights: [],
+  };
+}
+
 function normalizeWhitespace(value) {
   return value.replace(/\s+/g, " ").trim();
 }
@@ -168,6 +181,17 @@ async function run() {
   });
 
   const $ = cheerio.load(response.data);
+  const pageText = normalizeWhitespace($("body").text());
+  const isVerificationPage =
+    /verify that you'?re not a robot/i.test(pageText) ||
+    /enable javascript/i.test(pageText);
+
+  if (isVerificationPage) {
+    console.warn("ESPN boxing schedule unavailable: verification page returned.");
+    console.log(JSON.stringify(emptyResult("verification page returned")));
+    return;
+  }
+
   const keyDatesHeader = $("h1, h2, h3, h4, h5, h6")
     .filter((_, el) =>
       normalizeWhitespace($(el).text()).toLowerCase().startsWith("key dates"),
@@ -175,12 +199,16 @@ async function run() {
     .first();
 
   if (!keyDatesHeader.length) {
-    throw new Error('Could not find "Key dates" header.');
+    console.warn('ESPN boxing schedule unavailable: could not find "Key dates" header.');
+    console.log(JSON.stringify(emptyResult('Could not find "Key dates" header.')));
+    return;
   }
 
   const keyDatesList = keyDatesHeader.nextAll("ul").first();
   if (!keyDatesList.length) {
-    throw new Error('Could not find <ul> following "Key dates" header.');
+    console.warn('ESPN boxing schedule unavailable: could not find <ul> following "Key dates" header.');
+    console.log(JSON.stringify(emptyResult('Could not find <ul> following "Key dates" header.')));
+    return;
   }
 
   const fights = [];

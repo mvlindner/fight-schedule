@@ -412,6 +412,11 @@ console.log("Starting fight data update pipeline");
 const store = loadFightStore();
 
 const espn = runStep("ESPN scraper", "node espnScraper.js");
+if (espn.sourceUnavailable) {
+  console.warn(
+    `ESPN scraper source unavailable: ${espn.sourceUnavailableReason || "unknown reason"}`,
+  );
+}
 const espnMerge = mergeScrapedFights(store, espn.fights || [], "espn");
 console.log(
   `Raw events scanned: ${espn.rawEventsScanned || 0} | Valid fights extracted: ${espn.validFightsExtracted || 0} | invalidFights: ${espn.invalidFights || 0} | duplicateFights: ${espn.duplicateFights || 0}`,
