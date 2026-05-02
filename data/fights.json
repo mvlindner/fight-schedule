@@ -14,7 +14,8 @@
       "status": "upcoming",
       "isTitleFight": true,
       "titleDetails": "Inoue's undisputed junior featherweight championship",
-      "titleLabel": "Undisputed Junior Featherweight Title"
+      "titleLabel": "Undisputed Junior Featherweight Title",
+      "broadcaster": "DAZN"
     },
     "gilbertozurdoramirezdavidbenavidez20260503": {
       "id": "gilbertozurdoramirezdavidbenavidez20260503",
@@ -26,7 +27,7 @@
       },
       "dateUTC": "2026-05-03T03:00:00Z",
       "location": "Las Vegas",
-      "broadcaster": "DAZN PPV",
+      "broadcaster": "PBC PPV on Prime Video",
       "link": "https://www.premierboxingchampions.com/fight-night-may-02-2026",
       "status": "upcoming",
       "isTitleFight": true,
