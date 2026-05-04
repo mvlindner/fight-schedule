@@ -29,7 +29,7 @@
       "location": "Las Vegas",
       "broadcaster": "PBC PPV on Prime Video",
       "link": "https://www.premierboxingchampions.com/fight-night-may-02-2026",
-      "status": "upcoming",
+      "status": "past",
       "isTitleFight": true,
       "titleDetails": "Ramirez's WBO and WBA cruiserweight titles",
       "titleLabel": "WBO Cruiserweight Title"
@@ -161,15 +161,15 @@
       "link": "https://www.matchroomboxing.com/events/rodriguez-vs-vargas/",
       "status": "upcoming"
     },
-    "xanderzayasjaronennis20260627": {
-      "id": "xanderzayasjaronennis20260627",
+    "xanderzayasjaronennis20260628": {
+      "id": "xanderzayasjaronennis20260628",
       "sport": "boxing",
       "eventName": null,
       "fighters": {
         "red": "Xander Zayas",
         "blue": "Jaron Ennis"
       },
-      "dateUTC": "2026-06-27T07:00:00Z",
+      "dateUTC": "2026-06-28T01:00:00Z",
       "location": "Brooklyn, New York",
       "broadcaster": "DAZN",
       "isTitleFight": true,
