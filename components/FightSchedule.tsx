@@ -17,12 +17,14 @@ import {
 
 type Props = {
   fights: Fight[];
+  lastUpdatedLabel?: string | null;
 };
 
 type LegalModal = "imprint" | "privacy" | null;
 const LEGAL_MODAL_CLOSE_MS = 450;
 
 const STORAGE_KEY = "user-timezone";
+const THEME_STORAGE_KEY = "fight-schedule-theme";
 const IANA_BY_TIMEZONE: Record<TimezoneOption, string> = {
   UTC: "UTC",
   CET: "Europe/Berlin",
@@ -106,7 +108,7 @@ function getCurrentUtcDateLabel(): string {
   }).format(new Date());
 }
 
-export default function FightSchedule({ fights }: Props) {
+export default function FightSchedule({ fights, lastUpdatedLabel }: Props) {
   const hasAppliedInitialFocusRef = useRef(false);
   const headerRef = useRef<HTMLDivElement | null>(null);
   const infoPanelRef = useRef<HTMLDivElement | null>(null);
@@ -117,6 +119,7 @@ export default function FightSchedule({ fights }: Props) {
   const [isTimezoneReady, setIsTimezoneReady] = useState(false);
   const [legalModal, setLegalModal] = useState<LegalModal>(null);
   const [isLegalModalClosing, setIsLegalModalClosing] = useState(false);
+  const [isReloading, setIsReloading] = useState(false);
   const [animatedTimelineDayKeys, setAnimatedTimelineDayKeys] = useState<string[]>([]);
   const timelineAnimationTimeoutRef = useRef<number | null>(null);
 
@@ -437,6 +440,17 @@ export default function FightSchedule({ fights }: Props) {
     setIsLegalModalClosing(true);
   }, []);
 
+  const reloadSchedule = useCallback(() => {
+    localStorage.setItem(
+      THEME_STORAGE_KEY,
+      document.body.classList.contains("dark") ? "dark" : "light",
+    );
+    setIsReloading(true);
+    window.setTimeout(() => {
+      window.location.reload();
+    }, 180);
+  }, []);
+
   return (
     <section
       className={`timeline-container mx-auto min-h-screen px-6 py-20 text-left text-neutral-900 dark:text-neutral-100 ${
@@ -448,16 +462,28 @@ export default function FightSchedule({ fights }: Props) {
         className={`header flex items-center justify-between ${isHeaderDimmed ? "header--dimmed" : ""}`}
       >
         <h1 className="text-3xl md:text-4xl font-semibold tracking-[-0.02em] leading-none text-neutral-900 dark:text-neutral-100">
-          fight schedule
-          <span
-            className={`transition-colors duration-200 ${
-              hasHighlightedState
-                ? "text-violet-600 dark:text-red-400"
-                : "text-neutral-900 dark:text-white"
+          <button
+            type="button"
+            onClick={reloadSchedule}
+            disabled={isReloading}
+            aria-label="Reload fight schedule"
+            className={`appearance-none bg-transparent p-0 text-left [font:inherit] text-inherit transition-opacity duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-neutral-900 disabled:cursor-wait dark:focus-visible:outline-neutral-100 ${
+              isReloading ? "opacity-80" : "cursor-pointer hover:opacity-90"
             }`}
           >
-            .
-          </span>
+            fight schedule
+            <span
+              className={`inline-block transition-colors duration-200 ${
+                isReloading
+                  ? "animate-pulse text-violet-600 dark:text-red-400"
+                  : hasHighlightedState
+                  ? "text-violet-600 dark:text-red-400"
+                  : "text-neutral-900 dark:text-white"
+              }`}
+            >
+              .
+            </span>
+          </button>
         </h1>
         {isTimezoneReady ? (
           <div className="flex items-center gap-3 leading-none text-neutral-500 dark:text-neutral-400">
@@ -580,6 +606,11 @@ export default function FightSchedule({ fights }: Props) {
       </main>
       {isTimezoneReady ? (
         <footer className="pt-14 pb-6 text-center">
+          {lastUpdatedLabel ? (
+            <p className="mb-5 text-[11px] uppercase tracking-[0.18em] text-neutral-500/45 dark:text-neutral-400/45">
+              Last updated {lastUpdatedLabel}
+            </p>
+          ) : null}
           <button
             type="button"
             onClick={() => {

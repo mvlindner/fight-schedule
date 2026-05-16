@@ -2,6 +2,8 @@ import FightSchedule from "@/components/FightSchedule";
 import fights from "@/data/fights.json";
 import { generateMockFights } from "@/lib/mockFights";
 import type { Fight } from "@/lib/time";
+import { statSync } from "node:fs";
+import path from "node:path";
 
 type ScrapedFight = {
   id?: string;
@@ -103,6 +105,20 @@ function normalizeFight(raw: unknown): Fight | null {
   return null;
 }
 
+function getLastUpdatedLabel(): string | null {
+  try {
+    const stats = statSync(path.join(process.cwd(), "data", "fights.json"));
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(stats.mtime);
+  } catch {
+    return null;
+  }
+}
+
 export default function Home() {
   const USE_MOCK_FIGHTS = false;
 
@@ -115,5 +131,5 @@ export default function Home() {
     ? mockFights
     : toFightList(fights).map(normalizeFight).filter((fight): fight is Fight => fight !== null);
 
-  return <FightSchedule fights={sourceFights} />;
+  return <FightSchedule fights={sourceFights} lastUpdatedLabel={getLastUpdatedLabel()} />;
 }
