@@ -6,6 +6,8 @@ const { buildFightId } = require("./scripts/fightStore");
 const ESPN_URL =
   "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule";
 const CURRENT_YEAR = 2026;
+const MONTH_DAY_LABEL =
+  /^(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:t)?(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s+\d{1,2}$/i;
 
 function emptyResult(reason) {
   return {
@@ -26,6 +28,10 @@ function normalizeWhitespace(value) {
 
 function toIsoDate(dateLabel) {
   const clean = normalizeWhitespace(dateLabel).replace(/,$/, "");
+  if (!MONTH_DAY_LABEL.test(clean)) {
+    return null;
+  }
+
   const parsed = new Date(`${clean} ${CURRENT_YEAR} UTC`);
   if (Number.isNaN(parsed.getTime())) {
     return null;

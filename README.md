@@ -77,6 +77,12 @@ Example:
 - Manual entries are auto-pruned from `data/manualFights.json` after they are older than fight time + 12h buffer + 24h.
 - GitHub Actions now commits both `data/fights.json` and `data/manualFights.json`, so auto-pruned manual entries persist in the repo.
 
+### Past Fight Cleanup
+
+- Fights become `past` after their scheduled time plus a 12h buffer.
+- When scraper data looks healthy, past fights are deleted after fight time + 12h buffer + 24h if they are no longer present in the latest scrape.
+- When scraper data looks incomplete, stale past fights are still deleted after fight time + 12h buffer + 24h + 24h fallback retention. This keeps GitHub Actions automated even when a source temporarily returns too little data.
+
 ### Boxing Title Fights
 
 The ESPN boxing scraper now extracts:

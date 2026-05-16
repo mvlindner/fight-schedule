@@ -11,6 +11,8 @@ const {
   buildFightId,
 } = require("./fightStore");
 const MANUAL_FIGHTS_PATH = path.join(__dirname, "..", "data", "manualFights.json");
+const MIN_SCRAPED_FIGHTS_FOR_SOURCE_AWARE_CLEANUP = 3;
+const STALE_PAST_FIGHT_RETENTION_MS = 24 * 60 * 60 * 1000;
 
 function normalizeName(value) {
   return String(value || "")
@@ -343,14 +345,20 @@ function getScheduledDateForCleanup(fight) {
 }
 
 function cleanupFights(store, scrapedFights) {
-  if (!scrapedFights || scrapedFights.length < 3) {
-    console.warn("Skipping deletion: scraper returned too few fights");
-    console.log("Past fights deleted: 0");
-    return { deletedCount: 0, exampleDeleted: null };
+  const canUseScrapeForDeletion =
+    scrapedFights &&
+    scrapedFights.length >= MIN_SCRAPED_FIGHTS_FOR_SOURCE_AWARE_CLEANUP;
+
+  if (!canUseScrapeForDeletion) {
+    console.warn(
+      "Scraper returned too few fights; using age-only cleanup for stale past fights",
+    );
   }
 
   const scrapedIds = new Set(
-    scrapedFights.map((fight) => String(fight?.id || "").trim()).filter(Boolean),
+    (scrapedFights || [])
+      .map((fight) => String(fight?.id || "").trim())
+      .filter(Boolean),
   );
 
   const now = new Date();
@@ -369,11 +377,13 @@ function cleanupFights(store, scrapedFights) {
     const timeSinceFightMs = now - fightDateWithBuffer;
     const olderThan24hSinceScheduledFight =
       timeSinceFightMs > 24 * 60 * 60 * 1000;
+    const stalePastFight =
+      timeSinceFightMs > 24 * 60 * 60 * 1000 + STALE_PAST_FIGHT_RETENTION_MS;
 
     const isPast = fight.status === "past";
-    const notInScrape = !scrapedIds.has(id);
+    const notInScrape = canUseScrapeForDeletion && !scrapedIds.has(id);
 
-    if (isPast && olderThan24hSinceScheduledFight && notInScrape) {
+    if (isPast && olderThan24hSinceScheduledFight && (notInScrape || stalePastFight)) {
       if (!exampleDeleted) {
         const red = fight?.fighters?.red || "Unknown";
         const blue = fight?.fighters?.blue || "Unknown";
