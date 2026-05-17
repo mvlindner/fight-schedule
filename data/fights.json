@@ -112,6 +112,20 @@
       "titleLabel": "WBO Junior Middleweight Title",
       "link": "https://www.matchroomboxing.com/events/zayas-vs-ennis/",
       "status": "upcoming"
+    },
+    "mcgregorholloway220260711": {
+      "id": "mcgregorholloway220260711",
+      "sport": "mma",
+      "eventName": "UFC 329",
+      "fighters": {
+        "red": "McGregor",
+        "blue": "Holloway 2"
+      },
+      "dateUTC": "2026-07-11T23:00:00Z",
+      "location": "Las Vegas",
+      "broadcaster": "Paramount+",
+      "link": "https://www.espn.com/mma/schedule",
+      "status": "upcoming"
     }
   }
 }
