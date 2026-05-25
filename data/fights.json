@@ -1,22 +1,5 @@
 {
   "fights": {
-    "oleksandrusykricoverhoeven20260523": {
-      "id": "oleksandrusykricoverhoeven20260523",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Oleksandr Usyk",
-        "blue": "Rico Verhoeven"
-      },
-      "dateUTC": "2026-05-23T20:00:00Z",
-      "location": "Giza, Egypt",
-      "broadcaster": "DAZN",
-      "link": "https://www.dazn.com/en-US/news/boxing/oleksandr-usyk-vs-rico-verhoeven-how-to-watch-fight-time-ringwalks-prediction-undercard-news-odds/lbotzto205bb1921c2ypx1b15",
-      "status": "past",
-      "isTitleFight": true,
-      "titleDetails": "Usyk's WBC heavyweight title",
-      "titleLabel": "WBC Heavyweight Title"
-    },
     "floydmayweathermannypacquiao20260919": {
       "id": "floydmayweathermannypacquiao20260919",
       "sport": "boxing",
