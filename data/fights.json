@@ -44,22 +44,6 @@
       "titleDetails": "Han's WBA women's lightweight title",
       "titleLabel": "WBA Women's Lightweight Title",
       "link": "https://www.mostvaluablepromotions.com/event/han-vs-holm-30052026/",
-      "status": "upcoming"
-    },
-    "dmitrybivolmichaeleifert20260530": {
-      "id": "dmitrybivolmichaeleifert20260530",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Dmitry Bivol",
-        "blue": "Michael Eifert"
-      },
-      "dateUTC": "2026-05-30T19:00:00Z",
-      "location": "Ekaterinburg, Russia",
-      "isTitleFight": true,
-      "titleDetails": "Bivol's WBA, IBF and WBO light heavyweight titles",
-      "titleLabel": "WBO Light Heavyweight Title",
-      "link": "https://www.ringmagazine.com/events/bivol-vs-eifert-4PBlC2GGq6sJ4WiyEufZr",
       "status": "past"
     },
     "antoniovargasjessebamrodriguez20260613": {
@@ -108,6 +92,55 @@
       "location": "Las Vegas",
       "broadcaster": "Paramount+",
       "link": "https://www.espn.com/mma/schedule",
+      "status": "upcoming"
+    },
+    "oscarcollazojoeycanoy20260620": {
+      "id": "oscarcollazojoeycanoy20260620",
+      "sport": "boxing",
+      "eventName": null,
+      "fighters": {
+        "red": "Oscar Collazo",
+        "blue": "Joey Canoy"
+      },
+      "dateUTC": "2026-06-20T00:00:00Z",
+      "location": "Oceanside, California",
+      "broadcaster": "DAZN",
+      "isTitleFight": true,
+      "titleDetails": "Collazo's WBA and WBO strawweight titles",
+      "titleLabel": "WBO Strawweight Title",
+      "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
+      "status": "upcoming"
+    },
+    "errolspencejrtimtszyu20260725": {
+      "id": "errolspencejrtimtszyu20260725",
+      "sport": "boxing",
+      "eventName": null,
+      "fighters": {
+        "red": "Errol Spence Jr.",
+        "blue": "Tim Tszyu"
+      },
+      "dateUTC": "2026-07-25T00:00:00Z",
+      "location": "TBA, Australia",
+      "broadcaster": "PBC PPV on Prime Video",
+      "isTitleFight": false,
+      "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
+      "status": "upcoming"
+    },
+    "caneloalvarezchristianmbilli20260912": {
+      "id": "caneloalvarezchristianmbilli20260912",
+      "sport": "boxing",
+      "eventName": null,
+      "fighters": {
+        "red": "Canelo Alvarez",
+        "blue": "Christian Mbilli"
+      },
+      "dateUTC": "2026-09-12T00:00:00Z",
+      "location": "Riyadh, Saudi Arabia",
+      "broadcaster": "DAZN",
+      "isTitleFight": true,
+      "titleDetails": "Mbilli's WBC super middleweight title",
+      "titleLabel": "WBC Super Middleweight Title",
+      "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
       "status": "upcoming"
     }
   }
