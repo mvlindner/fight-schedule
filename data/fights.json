@@ -27,7 +27,8 @@
       "location": "Washington",
       "broadcaster": "Paramount+",
       "link": "https://www.ufc.com/event/ufc-freedom-250",
-      "status": "upcoming"
+      "status": "upcoming",
+      "eventNumber": "250"
     },
     "stephaniehanhollyholm20260531": {
       "id": "stephaniehanhollyholm20260531",
@@ -91,8 +92,9 @@
       "dateUTC": "2026-07-11T23:00:00Z",
       "location": "Las Vegas",
       "broadcaster": "Paramount+",
-      "link": "https://www.espn.com/mma/schedule",
-      "status": "upcoming"
+      "link": "https://www.ufc.com/event/ufc-329",
+      "status": "upcoming",
+      "eventNumber": "329"
     },
     "oscarcollazojoeycanoy20260620": {
       "id": "oscarcollazojoeycanoy20260620",
@@ -102,7 +104,7 @@
         "red": "Oscar Collazo",
         "blue": "Joey Canoy"
       },
-      "dateUTC": "2026-06-20T00:00:00Z",
+      "dateUTC": "2026-06-20T10:00:00Z",
       "location": "Oceanside, California",
       "broadcaster": "DAZN",
       "isTitleFight": true,
@@ -119,7 +121,7 @@
         "red": "Errol Spence Jr.",
         "blue": "Tim Tszyu"
       },
-      "dateUTC": "2026-07-25T00:00:00Z",
+      "dateUTC": "2026-07-25T07:00:00Z",
       "location": "TBA, Australia",
       "broadcaster": "PBC PPV on Prime Video",
       "isTitleFight": false,

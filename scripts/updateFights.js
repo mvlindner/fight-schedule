@@ -263,6 +263,13 @@ function mergeScrapedFights(store, scrapedFights, sourceName) {
     const matchId = findEquivalentExistingId(store, scrapedFight, incomingId);
     const existing = matchId ? store.fights[matchId] : null;
     const merged = mergeFight(existing, { ...scrapedFight, id: incomingId }, ["link"]);
+    if (
+      existing &&
+      !hasReliableFightCardLink(existing) &&
+      hasReliableFightCardLink(scrapedFight)
+    ) {
+      merged.link = scrapedFight.link;
+    }
 
     if (!existing) {
       store.fights[merged.id] = merged;
@@ -311,6 +318,7 @@ function hasReliableFightCardLink(fight) {
     /google\.com\/search/i,
     /espn\.com\/boxing\/story/i,
     /espn\.com\/mma\/fightcenter/i,
+    /espn\.com\/mma\/schedule/i,
   ];
 
   return !placeholderPatterns.some((pattern) => pattern.test(link));

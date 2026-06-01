@@ -3,14 +3,29 @@ const cheerio = require("cheerio");
 const { chromium } = require("playwright");
 const fs = require("fs");
 const path = require("path");
+const { DateTime } = require("luxon");
 const { loadFightStore, saveFightStore, applyStatuses } = require("./scripts/fightStore");
 const { buildFightId } = require("./scripts/fightStore");
 
 const BOXINGSCENE_URL = "https://www.boxingscene.com/schedule";
 const MANUAL_FIGHTS_PATH = path.join(__dirname, "data", "manualFights.json");
+const BOXING_MAIN_EVENT_OFFSET_HOURS = 3;
 const MONTHS = {
   jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
   jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
+};
+const ZONE_BY_ABBR = {
+  EST: "America/New_York",
+  EDT: "America/New_York",
+  CST: "America/Chicago",
+  CDT: "America/Chicago",
+  MST: "America/Denver",
+  MDT: "America/Denver",
+  PST: "America/Los_Angeles",
+  PDT: "America/Los_Angeles",
+  GMT: "UTC",
+  UTC: "UTC",
+  BST: "Europe/London",
 };
 
 function normalize(value) {
@@ -25,6 +40,104 @@ function normalizeNameForMatch(value) {
     .replace(/\((.*?)\)/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function dateOnlyToMs(date) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return NaN;
+  }
+  return Date.parse(`${date}T00:00:00.000Z`);
+}
+
+function formatUtcDateTime(dateTime) {
+  return dateTime.toUTC().toFormat("yyyy-LL-dd'T'HH:mm:ss'Z'");
+}
+
+function parseLocalTimeToUtc(date, rawTime, zoneAbbr) {
+  const zone = ZONE_BY_ABBR[String(zoneAbbr || "").toUpperCase()];
+  if (!zone) {
+    return null;
+  }
+
+  const timeMatch = normalize(rawTime).match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/i);
+  if (!timeMatch) {
+    return null;
+  }
+
+  let hours = Number(timeMatch[1]);
+  const minutes = Number(timeMatch[2] || "0");
+  const meridiem = String(timeMatch[3] || "").toUpperCase();
+
+  if (meridiem) {
+    hours %= 12;
+    if (meridiem === "PM") {
+      hours += 12;
+    }
+  }
+
+  const [year, month, day] = date.split("-").map(Number);
+  const localDateTime = DateTime.fromObject(
+    { year, month, day, hour: hours, minute: minutes, second: 0 },
+    { zone },
+  );
+
+  if (!localDateTime.isValid) {
+    return null;
+  }
+
+  return formatUtcDateTime(localDateTime);
+}
+
+function parseBoxingSceneEvent(text) {
+  const currentFormatMatch = text.match(
+    /(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),\s*([A-Za-z]{3})\s+(\d{1,2}),\s*(\d{4})\s*-\s*(\d{1,2}(?::\d{2})?\s*(?:AM|PM)?)\s*(EST|EDT|CST|CDT|MST|MDT|PST|PDT|GMT|UTC|BST)/i,
+  );
+
+  if (currentFormatMatch) {
+    const month = MONTHS[currentFormatMatch[1].toLowerCase()];
+    if (!month) {
+      return null;
+    }
+
+    const year = Number(currentFormatMatch[3]);
+    const day = Number(currentFormatMatch[2]);
+    const date = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const dateUTC = parseLocalTimeToUtc(
+      date,
+      currentFormatMatch[4],
+      currentFormatMatch[5],
+    );
+
+    if (!dateUTC) {
+      return null;
+    }
+
+    return { date, dateUTC };
+  }
+
+  const legacyFormatMatch = text.match(
+    /(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s*\|\s*([A-Za-z]{3})\s+(\d{1,2}),\s*(\d{4})\s*\|\s*(\d{1,2}(?::\d{2})?\s*(?:AM|PM)|\d{1,2}:\d{2})/i,
+  );
+
+  if (!legacyFormatMatch) {
+    return null;
+  }
+
+  const month = MONTHS[legacyFormatMatch[2].toLowerCase()];
+  if (!month) {
+    return null;
+  }
+
+  const year = Number(legacyFormatMatch[4]);
+  const day = Number(legacyFormatMatch[3]);
+  const date = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  const dateUTC = parseLocalTimeToUtc(date, legacyFormatMatch[5], "EST");
+
+  if (!dateUTC) {
+    return null;
+  }
+
+  return { date, dateUTC };
 }
 
 function loadManualOverrideIds() {
@@ -116,35 +229,21 @@ async function run() {
 
     const card = $(linkEl).closest(".card");
     const text = normalize(card.text());
-    if (!text.toLowerCase().includes(" vs ")) {
+    if (!/\bv(?:s\.?|\.?)\s/i.test(text)) {
       invalidFights += 1;
       return;
     }
 
-    const dateMatch = text.match(
-      /(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\s*\|\s*([A-Za-z]{3})\s+(\d{1,2}),\s*(\d{4})\s*\|/i,
-    );
-    if (!dateMatch) {
-      invalidFights += 1;
-      return;
-    }
-    const timeMatch = text.match(/\|\s*(\d{1,2}(?::\d{2})?\s*(?:AM|PM)|\d{1,2}:\d{2})\b/i);
-    if (!timeMatch) {
+    const parsedEvent = parseBoxingSceneEvent(text);
+    if (!parsedEvent) {
       invalidFights += 1;
       return;
     }
 
-    const month = MONTHS[dateMatch[2].toLowerCase()];
-    if (!month) {
-      invalidFights += 1;
-      return;
-    }
-    const day = Number(dateMatch[3]);
-    const year = Number(dateMatch[4]);
     events.push({
-      date: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
+      date: parsedEvent.date,
+      dateUTC: parsedEvent.dateUTC,
       fightersText: normalizeNameForMatch(text),
-      timeString: normalize(timeMatch[1]).toUpperCase(),
     });
   });
   const validFightsExtracted = events.length;
@@ -164,9 +263,11 @@ async function run() {
     const red = normalizeNameForMatch(fight?.fighters?.red);
     const blue = normalizeNameForMatch(fight?.fighters?.blue);
     const date = String(fight?.dateUTC || "").slice(0, 10);
+    const fightDateMs = dateOnlyToMs(date);
     const match = events.find(
       (event) =>
-        event.date === date &&
+        Number.isFinite(fightDateMs) &&
+        Math.abs(dateOnlyToMs(event.date) - fightDateMs) <= 24 * 60 * 60 * 1000 &&
         event.fightersText.includes(red) &&
         event.fightersText.includes(blue),
     );
@@ -176,49 +277,13 @@ async function run() {
       continue;
     }
 
-    const rawTime = match.timeString;
-    let hours = 0;
-    let minutes = 0;
-    const twelveHour = rawTime.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
-    const twentyFourHour = rawTime.match(/^(\d{1,2}):(\d{2})$/);
-
-    if (twelveHour) {
-      hours = Number(twelveHour[1]) % 12;
-      minutes = Number(twelveHour[2] || "0");
-      if (twelveHour[3].toUpperCase() === "PM") {
-        hours += 12;
-      }
-    } else if (twentyFourHour) {
-      hours = Number(twentyFourHour[1]);
-      minutes = Number(twentyFourHour[2]);
-    } else {
-      skipped += 1;
-      continue;
-    }
-
-    const parsedHours = String(hours).padStart(2, "0");
-    const parsedMinutes = String(minutes).padStart(2, "0");
-    const parsedET = `${parsedHours}:${parsedMinutes}`;
-
-    const [year, month, day] = date.split("-").map(Number);
-    const utcDate = new Date(Date.UTC(year, month - 1, day, hours + 4, minutes, 0));
+    let finalUTC = match.dateUTC;
     if (fight.sport === "boxing") {
-      utcDate.setUTCHours(utcDate.getUTCHours() + 3);
-    }
-    if (fight.sport === "mma") {
-      utcDate.setUTCHours(utcDate.getUTCHours() + 2);
-    }
-
-    const yyyy = utcDate.getUTCFullYear();
-    const mm = String(utcDate.getUTCMonth() + 1).padStart(2, "0");
-    const dd = String(utcDate.getUTCDate()).padStart(2, "0");
-    const hh = String(utcDate.getUTCHours()).padStart(2, "0");
-    const mi = String(utcDate.getUTCMinutes()).padStart(2, "0");
-    const finalUTC = `${yyyy}-${mm}-${dd}T${hh}:${mi}:00Z`;
-
-    if (!/^\d{2}:\d{2}$/.test(parsedET)) {
-      skipped += 1;
-      continue;
+      finalUTC = formatUtcDateTime(
+        DateTime.fromISO(match.dateUTC, { zone: "UTC" }).plus({
+          hours: BOXING_MAIN_EVENT_OFFSET_HOURS,
+        }),
+      );
     }
 
     if (fight.dateUTC === finalUTC) {

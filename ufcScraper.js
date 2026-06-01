@@ -4,6 +4,9 @@ const cheerio = require("cheerio");
 const { buildFightId } = require("./scripts/fightStore");
 
 const ESPN_URL = "https://www.espn.com/mma/schedule";
+const UFC_EVENT_URL_OVERRIDES = {
+  "250": "https://www.ufc.com/event/ufc-freedom-250",
+};
 const MONTHS = {
   jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6,
   jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12,
@@ -22,7 +25,12 @@ function toCityLocation(location) {
 }
 
 function resolveFightLink(fight) {
-  if (fight.link && fight.link.includes("espn")) {
+  const eventNumber = String(fight.eventNumber || "").trim();
+  if (fight.sport === "mma" && eventNumber) {
+    return UFC_EVENT_URL_OVERRIDES[eventNumber] || `https://www.ufc.com/event/ufc-${eventNumber}`;
+  }
+
+  if (fight.link && !fight.link.includes("espn")) {
     return fight.link;
   }
 
@@ -149,6 +157,7 @@ async function run() {
       id,
       sport,
       eventName: `UFC ${eventNumber}`,
+      eventNumber,
       fighters: { red, blue },
       dateUTC,
       location: location || undefined,
