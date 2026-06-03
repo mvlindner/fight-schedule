@@ -30,23 +30,6 @@
       "status": "upcoming",
       "eventNumber": "250"
     },
-    "stephaniehanhollyholm20260531": {
-      "id": "stephaniehanhollyholm20260531",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Stephanie Han",
-        "blue": "Holly Holm"
-      },
-      "dateUTC": "2026-05-31T04:00:00Z",
-      "location": "El Paso, Texas",
-      "broadcaster": "ESPN",
-      "isTitleFight": true,
-      "titleDetails": "Han's WBA women's lightweight title",
-      "titleLabel": "WBA Women's Lightweight Title",
-      "link": "https://www.mostvaluablepromotions.com/event/han-vs-holm-30052026/",
-      "status": "past"
-    },
     "antoniovargasjessebamrodriguez20260613": {
       "id": "antoniovargasjessebamrodriguez20260613",
       "sport": "boxing",
