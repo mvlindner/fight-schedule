@@ -30,15 +30,15 @@
       "status": "upcoming",
       "eventNumber": "250"
     },
-    "antoniovargasjessebamrodriguez20260613": {
-      "id": "antoniovargasjessebamrodriguez20260613",
+    "antoniovargasjessebamrodriguez20260614": {
+      "id": "antoniovargasjessebamrodriguez20260614",
       "sport": "boxing",
       "eventName": null,
       "fighters": {
         "red": "Antonio Vargas",
         "blue": "Jesse \"Bam\" Rodriguez"
       },
-      "dateUTC": "2026-06-13T07:00:00Z",
+      "dateUTC": "2026-06-14T03:00:00Z",
       "location": "Glendale, Arizona",
       "broadcaster": "DAZN",
       "isTitleFight": true,
@@ -79,15 +79,15 @@
       "status": "upcoming",
       "eventNumber": "329"
     },
-    "oscarcollazojoeycanoy20260620": {
-      "id": "oscarcollazojoeycanoy20260620",
+    "oscarcollazojoeycanoy20260621": {
+      "id": "oscarcollazojoeycanoy20260621",
       "sport": "boxing",
       "eventName": null,
       "fighters": {
         "red": "Oscar Collazo",
         "blue": "Joey Canoy"
       },
-      "dateUTC": "2026-06-20T10:00:00Z",
+      "dateUTC": "2026-06-21T03:00:00Z",
       "location": "Oceanside, California",
       "broadcaster": "DAZN",
       "isTitleFight": true,
