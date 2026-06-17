@@ -30,23 +30,6 @@
       "status": "past",
       "eventNumber": "250"
     },
-    "antoniovargasjessebamrodriguez20260614": {
-      "id": "antoniovargasjessebamrodriguez20260614",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Antonio Vargas",
-        "blue": "Jesse \"Bam\" Rodriguez"
-      },
-      "dateUTC": "2026-06-14T03:00:00Z",
-      "location": "Glendale, Arizona",
-      "broadcaster": "DAZN",
-      "isTitleFight": true,
-      "titleDetails": "Vargas' WBA bantamweight title",
-      "titleLabel": "WBA Bantamweight Title",
-      "link": "https://www.matchroomboxing.com/events/rodriguez-vs-vargas/",
-      "status": "past"
-    },
     "xanderzayasjaronennis20260628": {
       "id": "xanderzayasjaronennis20260628",
       "sport": "boxing",
