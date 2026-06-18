@@ -15,21 +15,6 @@
       "status": "upcoming",
       "isTitleFight": false
     },
-    "topuriagaethje20260615": {
-      "id": "topuriagaethje20260615",
-      "sport": "mma",
-      "eventName": "UFC 250",
-      "fighters": {
-        "red": "Topuria",
-        "blue": "Gaethje"
-      },
-      "dateUTC": "2026-06-15T02:00:00Z",
-      "location": "Washington",
-      "broadcaster": "Paramount+",
-      "link": "https://www.ufc.com/event/ufc-freedom-250",
-      "status": "past",
-      "eventNumber": "250"
-    },
     "xanderzayasjaronennis20260628": {
       "id": "xanderzayasjaronennis20260628",
       "sport": "boxing",
