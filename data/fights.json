@@ -64,15 +64,15 @@
       "link": "https://www.tapology.com/fightcenter/bouts/1140648-golden-boy-fight-night-oscar-el-pupilo-collazo-vs-joey-canoy-j-singwangcha-canoy",
       "status": "upcoming"
     },
-    "errolspencejrtimtszyu20260725": {
-      "id": "errolspencejrtimtszyu20260725",
+    "errolspencejrtimtszyu20260726": {
+      "id": "errolspencejrtimtszyu20260726",
       "sport": "boxing",
       "eventName": null,
       "fighters": {
         "red": "Errol Spence Jr.",
         "blue": "Tim Tszyu"
       },
-      "dateUTC": "2026-07-25T07:00:00Z",
+      "dateUTC": "2026-07-26T06:00:00Z",
       "location": "TBA, Australia",
       "broadcaster": "PBC PPV on Prime Video",
       "isTitleFight": false,
