@@ -47,23 +47,6 @@
       "status": "upcoming",
       "eventNumber": "329"
     },
-    "oscarcollazojoeycanoy20260621": {
-      "id": "oscarcollazojoeycanoy20260621",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Oscar Collazo",
-        "blue": "Joey Canoy"
-      },
-      "dateUTC": "2026-06-21T03:00:00Z",
-      "location": "Oceanside, California",
-      "broadcaster": "DAZN",
-      "isTitleFight": true,
-      "titleDetails": "Collazo's WBA and WBO strawweight titles",
-      "titleLabel": "WBO Strawweight Title",
-      "link": "https://www.tapology.com/fightcenter/bouts/1140648-golden-boy-fight-night-oscar-el-pupilo-collazo-vs-joey-canoy-j-singwangcha-canoy",
-      "status": "past"
-    },
     "errolspencejrtimtszyu20260726": {
       "id": "errolspencejrtimtszyu20260726",
       "sport": "boxing",
