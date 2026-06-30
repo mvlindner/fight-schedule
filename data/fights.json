@@ -15,23 +15,6 @@
       "status": "upcoming",
       "isTitleFight": false
     },
-    "xanderzayasjaronennis20260628": {
-      "id": "xanderzayasjaronennis20260628",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Xander Zayas",
-        "blue": "Jaron Ennis"
-      },
-      "dateUTC": "2026-06-28T01:00:00Z",
-      "location": "Brooklyn, New York",
-      "broadcaster": "DAZN",
-      "isTitleFight": true,
-      "titleDetails": "Zayas' WBA and WBO junior middleweight titles",
-      "titleLabel": "WBO Junior Middleweight Title",
-      "link": "https://www.matchroomboxing.com/events/zayas-vs-ennis/",
-      "status": "past"
-    },
     "mcgregorholloway220260711": {
       "id": "mcgregorholloway220260711",
       "sport": "mma",
@@ -77,6 +60,55 @@
       "titleDetails": "Mbilli's WBC super middleweight title",
       "titleLabel": "WBC Super Middleweight Title",
       "link": "https://www.tapology.com/fightcenter/events/143174-canelo-vs-mbili",
+      "status": "upcoming"
+    },
+    "chantellecameronmikaelamayer20260830": {
+      "id": "chantellecameronmikaelamayer20260830",
+      "sport": "boxing",
+      "eventName": null,
+      "fighters": {
+        "red": "Chantelle Cameron",
+        "blue": "Mikaela Mayer"
+      },
+      "dateUTC": "2026-08-30T00:00:00Z",
+      "location": "Birmingham, England",
+      "broadcaster": "ESPN+",
+      "isTitleFight": true,
+      "titleDetails": "Cameron's WBO women's junior middleweight title and Mayer's WBA and WBC women's junior middleweight titles",
+      "titleLabel": "WBO Women's Junior Middleweight Title",
+      "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
+      "status": "upcoming"
+    },
+    "katietaylorflorapili20260905": {
+      "id": "katietaylorflorapili20260905",
+      "sport": "boxing",
+      "eventName": null,
+      "fighters": {
+        "red": "Katie Taylor",
+        "blue": "Flora Pili"
+      },
+      "dateUTC": "2026-09-05T00:00:00Z",
+      "location": "Dublin, Ireland",
+      "broadcaster": "DAZN",
+      "isTitleFight": true,
+      "titleDetails": "Taylor's WBO, IBF and WBA junior welterweight titles and the vacant WBC junior welterweight title",
+      "titleLabel": "WBO Junior Welterweight Title",
+      "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
+      "status": "upcoming"
+    },
+    "makhachevmachadogarry20260815": {
+      "id": "makhachevmachadogarry20260815",
+      "sport": "mma",
+      "eventName": "UFC 330",
+      "eventNumber": "330",
+      "fighters": {
+        "red": "Makhachev",
+        "blue": "Machado Garry"
+      },
+      "dateUTC": "2026-08-15T23:00:00Z",
+      "location": "Philadelphia",
+      "broadcaster": "Paramount+",
+      "link": "https://www.ufc.com/event/ufc-330",
       "status": "upcoming"
     }
   }
