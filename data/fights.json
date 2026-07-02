@@ -39,7 +39,7 @@
         "blue": "Tim Tszyu"
       },
       "dateUTC": "2026-07-26T06:00:00Z",
-      "location": "TBA, Australia",
+      "location": "Sidney, Australia",
       "broadcaster": "PBC PPV on Prime Video",
       "isTitleFight": false,
       "link": "https://www.premierboxingchampions.com/errol-spence-jr-vs-tim-tszyu",
@@ -60,23 +60,6 @@
       "titleDetails": "Mbilli's WBC super middleweight title",
       "titleLabel": "WBC Super Middleweight Title",
       "link": "https://www.tapology.com/fightcenter/events/143174-canelo-vs-mbili",
-      "status": "upcoming"
-    },
-    "chantellecameronmikaelamayer20260830": {
-      "id": "chantellecameronmikaelamayer20260830",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Chantelle Cameron",
-        "blue": "Mikaela Mayer"
-      },
-      "dateUTC": "2026-08-30T00:00:00Z",
-      "location": "Birmingham, England",
-      "broadcaster": "ESPN+",
-      "isTitleFight": true,
-      "titleDetails": "Cameron's WBO women's junior middleweight title and Mayer's WBA and WBC women's junior middleweight titles",
-      "titleLabel": "WBO Women's Junior Middleweight Title",
-      "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
       "status": "upcoming"
     },
     "katietaylorflorapili20260905": {
@@ -109,6 +92,38 @@
       "location": "Philadelphia",
       "broadcaster": "Paramount+",
       "link": "https://www.ufc.com/event/ufc-330",
+      "status": "upcoming"
+    },
+    "anthonyjoshuakristianprenga20260725": {
+      "id": "anthonyjoshuakristianprenga20260725",
+      "sport": "boxing",
+      "eventName": null,
+      "fighters": {
+        "red": "Anthony Joshua",
+        "blue": "Kristian Prenga"
+      },
+      "dateUTC": "2026-07-25T19:00:00Z",
+      "location": "Jeddah, Saudi Arabia",
+      "broadcaster": "DAZN PPV",
+      "isTitleFight": false,
+      "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
+      "status": "upcoming"
+    },
+    "chantellecameronmikaelamayer20260830": {
+      "id": "chantellecameronmikaelamayer20260830",
+      "sport": "boxing",
+      "eventName": null,
+      "fighters": {
+        "red": "Chantelle Cameron",
+        "blue": "Mikaela Mayer"
+      },
+      "dateUTC": "2026-08-30T00:00:00Z",
+      "location": "Birmingham, England",
+      "broadcaster": "ESPN+",
+      "isTitleFight": true,
+      "titleDetails": "Cameron's WBO women's junior middleweight title and Mayer's WBA and WBC women's junior middleweight titles",
+      "titleLabel": "WBO Women's Junior Middleweight Title",
+      "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
       "status": "upcoming"
     }
   }
