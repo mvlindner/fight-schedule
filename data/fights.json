@@ -39,7 +39,7 @@
         "blue": "Tim Tszyu"
       },
       "dateUTC": "2026-07-26T06:00:00Z",
-      "location": "Sidney, Australia",
+      "location": "Sydney, Australia",
       "broadcaster": "PBC PPV on Prime Video",
       "isTitleFight": false,
       "link": "https://www.premierboxingchampions.com/errol-spence-jr-vs-tim-tszyu",
@@ -74,8 +74,8 @@
       "location": "Dublin, Ireland",
       "broadcaster": "DAZN",
       "isTitleFight": true,
-      "titleDetails": "Taylor's WBO, IBF and WBA junior welterweight titles and the vacant WBC junior welterweight title",
-      "titleLabel": "WBO Junior Welterweight Title",
+      "titleDetails": "Taylor's WBO, IBF and WBA women's junior welterweight titles and the vacant WBC women's junior welterweight title",
+      "titleLabel": "WBO Women's Junior Welterweight Title",
       "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
       "status": "upcoming"
     },
