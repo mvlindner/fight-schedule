@@ -15,21 +15,6 @@
       "status": "upcoming",
       "isTitleFight": false
     },
-    "mcgregorholloway220260711": {
-      "id": "mcgregorholloway220260711",
-      "sport": "mma",
-      "eventName": "UFC 329",
-      "fighters": {
-        "red": "McGregor",
-        "blue": "Holloway 2"
-      },
-      "dateUTC": "2026-07-11T23:00:00Z",
-      "location": "Las Vegas",
-      "broadcaster": "Paramount+",
-      "link": "https://www.ufc.com/event/ufc-329",
-      "status": "past",
-      "eventNumber": "329"
-    },
     "errolspencejrtimtszyu20260726": {
       "id": "errolspencejrtimtszyu20260726",
       "sport": "boxing",
