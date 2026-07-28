@@ -79,21 +79,6 @@
       "link": "https://www.ufc.com/event/ufc-330",
       "status": "upcoming"
     },
-    "anthonyjoshuakristianprenga20260725": {
-      "id": "anthonyjoshuakristianprenga20260725",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Anthony Joshua",
-        "blue": "Kristian Prenga"
-      },
-      "dateUTC": "2026-07-25T19:00:00Z",
-      "location": "Jeddah, Saudi Arabia",
-      "broadcaster": "DAZN PPV",
-      "isTitleFight": false,
-      "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
-      "status": "past"
-    },
     "chantellecameronmikaelamayer20260830": {
       "id": "chantellecameronmikaelamayer20260830",
       "sport": "boxing",
