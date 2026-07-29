@@ -15,21 +15,6 @@
       "status": "upcoming",
       "isTitleFight": false
     },
-    "errolspencejrtimtszyu20260726": {
-      "id": "errolspencejrtimtszyu20260726",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Errol Spence Jr.",
-        "blue": "Tim Tszyu"
-      },
-      "dateUTC": "2026-07-26T04:00:00Z",
-      "location": "Sydney, Australia",
-      "broadcaster": "PBC PPV on Prime Video",
-      "isTitleFight": false,
-      "link": "https://www.premierboxingchampions.com/errol-spence-jr-vs-tim-tszyu",
-      "status": "past"
-    },
     "caneloalvarezchristianmbilli20260912": {
       "id": "caneloalvarezchristianmbilli20260912",
       "sport": "boxing",
@@ -55,7 +40,7 @@
         "red": "Katie Taylor",
         "blue": "Flora Pili"
       },
-      "dateUTC": "2026-09-05T00:00:00Z",
+      "dateUTC": "2026-09-05T18:00:00Z",
       "location": "Dublin, Ireland",
       "broadcaster": "DAZN",
       "isTitleFight": true,
