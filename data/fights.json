@@ -49,21 +49,6 @@
       "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
       "status": "upcoming"
     },
-    "makhachevmachadogarry20260815": {
-      "id": "makhachevmachadogarry20260815",
-      "sport": "mma",
-      "eventName": "UFC 330",
-      "eventNumber": "330",
-      "fighters": {
-        "red": "Makhachev",
-        "blue": "Machado Garry"
-      },
-      "dateUTC": "2026-08-15T23:00:00Z",
-      "location": "Philadelphia",
-      "broadcaster": "Paramount+",
-      "link": "https://www.ufc.com/event/ufc-330",
-      "status": "past"
-    },
     "chantellecameronmikaelamayer20260830": {
       "id": "chantellecameronmikaelamayer20260830",
       "sport": "boxing",
