@@ -31,23 +31,6 @@
       "titleLabel": "WBC Super Middleweight Title",
       "link": "https://www.tapology.com/fightcenter/events/143174-canelo-vs-mbili",
       "status": "upcoming"
-    },
-    "katietaylorflorapili20260905": {
-      "id": "katietaylorflorapili20260905",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Katie Taylor",
-        "blue": "Flora Pili"
-      },
-      "dateUTC": "2026-09-05T18:00:00Z",
-      "location": "Dublin, Ireland",
-      "broadcaster": "DAZN",
-      "isTitleFight": true,
-      "titleDetails": "Taylor's WBO, IBF and WBA women's junior welterweight titles and the vacant WBC women's junior welterweight title",
-      "titleLabel": "WBO Women's Junior Welterweight Title",
-      "link": "https://www.espn.com/boxing/story/_/id/12508267/boxing-schedule",
-      "status": "past"
     }
   }
 }
