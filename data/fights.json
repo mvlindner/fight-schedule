@@ -14,23 +14,6 @@
       "link": "https://www.dazn.com/en-US/news/boxing/mayweather-vs-pacquiao-how-to-watch-fight-time-ringwalks-prediction-undercard-news-odds/7708rqovb9v01nzovbncndti8",
       "status": "upcoming",
       "isTitleFight": false
-    },
-    "caneloalvarezchristianmbilli20260912": {
-      "id": "caneloalvarezchristianmbilli20260912",
-      "sport": "boxing",
-      "eventName": null,
-      "fighters": {
-        "red": "Canelo Alvarez",
-        "blue": "Christian Mbilli"
-      },
-      "dateUTC": "2026-09-12T00:00:00Z",
-      "location": "Riyadh, Saudi Arabia",
-      "broadcaster": "DAZN",
-      "isTitleFight": true,
-      "titleDetails": "Mbilli's WBC super middleweight title",
-      "titleLabel": "WBC Super Middleweight Title",
-      "link": "https://www.tapology.com/fightcenter/events/143174-canelo-vs-mbili",
-      "status": "past"
     }
   }
 }
